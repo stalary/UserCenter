@@ -12,3 +12,5 @@ and I need to apply for a project id for you.
 > There are two ways to use this project.
 - use token(need save in header)
 - use cookie(need CORS)
+
+> I can provide the log when you need it
