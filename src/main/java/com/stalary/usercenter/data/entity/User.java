@@ -2,6 +2,8 @@ package com.stalary.usercenter.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,38 +23,45 @@ import javax.persistence.*;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "user")
+@Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@ApiModel("用户对象")
 public class User extends BaseEntity {
 
     /**
      * 用户名
      */
+    @ApiModelProperty("用户名")
     private String username;
 
     /**
      * 昵称(非必须)
      */
+    @ApiModelProperty("昵称(非必须)")
     private String nickname;
 
     /**
      * 邮箱(非必须)
      */
+    @ApiModelProperty("邮箱(非必须)")
     private String email;
 
     /**
      * 手机号(非必须)
      */
+    @ApiModelProperty("手机号(非必须)")
     private String phone;
 
     /**
      * 头像(非必须)
      */
+    @ApiModelProperty("头像(非必须)")
     private String avatar;
 
     /**
      * 密码
      */
-    @JsonIgnore
+    @ApiModelProperty("密码")
     private String password;
 
     /**
@@ -64,7 +73,11 @@ public class User extends BaseEntity {
     /**
      * 项目id
      */
-    @JsonIgnore
-    private long projectId;
+    @ApiModelProperty("项目编号(用户中心进行分发)")
+    private Long projectId;
+
+    @Transient
+    @ApiModelProperty("是否记住密码")
+    private boolean remember = false;
 
 }

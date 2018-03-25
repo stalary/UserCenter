@@ -1,11 +1,13 @@
 package com.stalary.usercenter.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -15,21 +17,16 @@ import java.util.Date;
  * @since 2018/03/24
  */
 @Data
-public abstract class BaseEntity {
+@MappedSuperclass
+public abstract class BaseEntity implements Serializable {
 
     /**
      * 自增id
      */
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty(hidden = true)
     private Long id;
-
-    /**
-     * 状态，-1为删除，0为正常
-     */
-    @JsonIgnore
-    private Integer status;
 
     /**
      * 最后更新时间
@@ -42,5 +39,13 @@ public abstract class BaseEntity {
      * 创建时间
      */
     @CreationTimestamp
+    @ApiModelProperty(hidden=true)
     private Date createTime;
+
+    /**
+     * 状态，-1为删除，0为正常，默认为0
+     */
+    @JsonIgnore
+    private Integer status = 0;
+
 }

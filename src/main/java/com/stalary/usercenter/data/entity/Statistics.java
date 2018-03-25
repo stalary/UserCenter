@@ -1,5 +1,6 @@
 package com.stalary.usercenter.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,18 +11,19 @@ import javax.persistence.Table;
 import java.util.Date;
 
 /**
- * Ticket
+ * UserStat
  *
  * @author lirongqian
- * @since 2018/03/24
+ * @since 2018/03/25
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "ticket")
+@Table(name = "statistics")
 @Entity
-public class Ticket extends BaseEntity {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Statistics extends BaseEntity {
 
     /**
      * 关联的用户id
@@ -29,12 +31,13 @@ public class Ticket extends BaseEntity {
     private Long userId;
 
     /**
-     * ticket内容
+     * 登陆次数
      */
-    private String ticket;
+    private Long loginCount;
 
     /**
-     * 到期时间
+     * 最近一次登陆的时间
      */
-    private Date expired;
+    private Date lateLoginTime;
+
 }
