@@ -17,4 +17,8 @@ public interface UserRepo extends BaseRepo<User, Long> {
      * @return
      */
     User findByUsernameAndProjectIdAndStatusGreaterThanEqual(String username, Long projectId, Integer status);
+
+    User findByPhoneAndProjectIdAndStatusGreaterThanEqual(String phone, Long projectId, Integer status);
+
+    User findByEmailAndProjectIdAndStatusGreaterThanEqual(String email, Long projectId, Integer status);
 }

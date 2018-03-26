@@ -9,11 +9,17 @@ import lombok.Getter;
  */
 public enum ResultEnum {
     UNKNOW_ERROR(-1000, "未知错误"),
+
     // 1开头为用户有关的错误
     USERNAME_EMPTY(1001, "用户名为空"),
     PASSWORD_EMPTY(1002, "密码为空"),
     USERNAME_PASSWORD_ERROR(1003, "账号密码错误"),
-    REPEAT_REGISTER(1003, "该用户已注册"),
+    USERNAME_REPEAT(1004, "该用户已注册"),
+    UPDATE_PASSWORD_ERROR(1005, "信息不足，无法修改密码"),
+
+    // 2开头为项目有关的错误
+    PROJECT_REPEAT(2001, "该用户已注册"),
+    PROJECT_ERROR(2002, "项目名错误"),
 
     SUCCESS(0, "成功");
 

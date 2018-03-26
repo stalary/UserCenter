@@ -32,8 +32,7 @@ public class TokenController {
     private UserService userService;
 
     @PostMapping("/register")
-    @ApiOperation(value = "注册", notes = "传入需要的user属性，进行注册，项目id必须要传")
-
+    @ApiOperation(value = "注册")
     public ResponseMessage register(
             @RequestBody @ApiParam(name = "用户注册的对象", value = "仅用户名，密码，项目id为必填项") User user,
             HttpServletRequest request) {
@@ -41,10 +40,17 @@ public class TokenController {
     }
 
     @PostMapping("/login")
-    @ApiOperation(value = "登陆", notes = "传入用户名和密码")
+    @ApiOperation(value = "登陆")
     public ResponseMessage login(
             @RequestBody @ApiParam(name = "用户登陆的对象", value = "传入用户名和密码和项目id，如果记住密码remember传true") User user,
             HttpServletRequest request) {
         return ResponseMessage.successMessage(userService.tokenLogin(user, request));
+    }
+
+    @PostMapping("/update")
+    @ApiOperation(value = "修改密码")
+    public ResponseMessage update(
+            @RequestBody @ApiParam(name = "用户修改密码的对象", value = "传入用户名和邮箱或者手机号以及新密码和项目id") User user) {
+        return ResponseMessage.successMessage(userService.tokenUpdate(user));
     }
 }

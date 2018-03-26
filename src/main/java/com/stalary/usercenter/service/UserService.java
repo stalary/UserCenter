@@ -71,7 +71,7 @@ public class UserService extends BaseService<User, UserRepo> {
         }
         // 重复注册
         if (repo.findByUsernameAndProjectIdAndStatusGreaterThanEqual(user.getUsername(), user.getProjectId(), 0) != null) {
-            throw new MyException(ResultEnum.REPEAT_REGISTER);
+            throw new MyException(ResultEnum.USERNAME_REPEAT);
         }
         // 注册用户
         String salt = PasswordUtil.get5UUID();
@@ -146,6 +146,37 @@ public class UserService extends BaseService<User, UserRepo> {
         UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
         producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
         // 返回token
+        return DigestUtil.Encrypt(oldUser.getId() + UCUtil.SPLIT + oldUser.getProjectId());
+    }
+
+    public String tokenUpdate(User user) {
+        // 用户名为空
+        if (StringUtils.isEmpty(user.getUsername())) {
+            throw new MyException(ResultEnum.USERNAME_EMPTY);
+        }
+        // 密码为空
+        if (StringUtils.isEmpty(user.getPassword())) {
+            throw new MyException(ResultEnum.PASSWORD_EMPTY);
+        }
+        User oldUser;
+        // 用户名错误
+        if (repo.findByUsernameAndProjectIdAndStatusGreaterThanEqual(user.getUsername(), user.getProjectId(), 0) == null) {
+            throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR);
+        }
+        // 通过手机号或者邮箱修改密码
+        if (StringUtils.isNotEmpty(user.getPhone())) {
+            oldUser = repo.findByPhoneAndProjectIdAndStatusGreaterThanEqual(user.getPhone(), user.getProjectId(), 0);
+        } else if (StringUtils.isNotEmpty(user.getEmail())) {
+            oldUser = repo.findByEmailAndProjectIdAndStatusGreaterThanEqual(user.getPhone(), user.getProjectId(), 0);
+        } else {
+            // 当手机号和邮箱都为空时，无法修改密码
+            throw new MyException(ResultEnum.UPDATE_PASSWORD_ERROR);
+        }
+        if (oldUser == null) {
+            throw new MyException(ResultEnum.UPDATE_PASSWORD_ERROR);
+        }
+        oldUser.setPassword(PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()));
+        repo.save(oldUser);
         return DigestUtil.Encrypt(oldUser.getId() + UCUtil.SPLIT + oldUser.getProjectId());
     }
 }
