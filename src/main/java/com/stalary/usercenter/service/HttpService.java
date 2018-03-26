@@ -155,6 +155,7 @@ public class HttpService {
         if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
+        log.info("ip: " + ip);
         return ip;
     }
 
@@ -162,10 +163,17 @@ public class HttpService {
         String str = null;
         try {
             str = doGet(UCUtil.ADDRESS_API + ip);
+            log.info("str: " + str);
         } catch (Exception e) {
             log.warn("get address failed！", e);
         }
-        JSONObject jsonObject = JSON.parseObject(str);
-        return jsonObject.get("country").toString() + UCUtil.SPLIT + jsonObject.get("province").toString() + UCUtil.SPLIT + jsonObject.get("city").toString();
+        String city = "";
+        if (str != null) {
+            if (str.contains("city")) {
+                JSONObject jsonObject = JSON.parseObject(str);
+                city = jsonObject.getOrDefault("city", "").toString();
+            }
+        }
+        return city;
     }
 }

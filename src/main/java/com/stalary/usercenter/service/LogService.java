@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
  * @since 2018/03/25
  */
 @Service
-@NoArgsConstructor
 public class LogService extends BaseService<Log, LogRepo> {
 
 

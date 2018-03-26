@@ -21,7 +21,14 @@ spring:
   jackson:
       serialization:
         indent_output: true
-
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    producer:
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: user_center_group
 #最大连接数
 http:
   maxTotal: 100

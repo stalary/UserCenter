@@ -110,4 +110,5 @@ public class UsercenterApplication {
     public PersistenceExceptionTranslationPostProcessor exceptionTranslation(){
         return new PersistenceExceptionTranslationPostProcessor();
     }
+
 }

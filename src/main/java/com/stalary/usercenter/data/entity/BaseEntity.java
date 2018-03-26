@@ -42,10 +42,4 @@ public abstract class BaseEntity implements Serializable {
     @ApiModelProperty(hidden=true)
     private Date createTime;
 
-    /**
-     * 状态，-1为删除，0为正常，默认为0
-     */
-    @JsonIgnore
-    private Integer status = 0;
-
 }

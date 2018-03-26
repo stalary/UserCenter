@@ -80,4 +80,10 @@ public class User extends BaseEntity {
     @ApiModelProperty("是否记住密码")
     private boolean remember = false;
 
+    /**
+     * 状态，-1为删除，0为正常，默认为0
+     */
+    @JsonIgnore
+    private Integer status = 0;
+
 }

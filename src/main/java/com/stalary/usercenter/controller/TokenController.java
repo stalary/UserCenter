@@ -35,8 +35,9 @@ public class TokenController {
     @ApiOperation(value = "注册", notes = "传入需要的user属性，进行注册，项目id必须要传")
 
     public ResponseMessage register(
-            @RequestBody @ApiParam(name = "用户注册的对象", value = "仅用户名，密码，项目id为必填项") User user) {
-        return ResponseMessage.successMessage(userService.tokenRegister(user));
+            @RequestBody @ApiParam(name = "用户注册的对象", value = "仅用户名，密码，项目id为必填项") User user,
+            HttpServletRequest request) {
+        return ResponseMessage.successMessage(userService.tokenRegister(user, request));
     }
 
     /*@PostMapping("/login")

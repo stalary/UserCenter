@@ -4,14 +4,40 @@ server:
     uri-encoding: UTF-8
 spring:
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://120.24.5.178:3306/userCenter?characterEncoding=utf-8&useSSL=false
+    jdbc-url: jdbc:mysql://120.24.5.178:3306/userCenter?characterEncoding=utf-8&useSSL=false
     username: root
     password: li197910
-    hikari:
-      maxLifetime: 1765000 #一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），缺省:30分钟，建议设置比数据库超时时长少30秒以上
-      maximumPoolSize: 15 #连接池中允许的最大连接数。缺省值：10；推荐的公式：((core_count * 2) + effective_spindle_count)
+    driver-class-name: com.mysql.jdbc.Driver
   http:
     encoding:
       charset: utf-8
       enabled: true
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: update
+    show-sql: true
+  jackson:
+      serialization:
+        indent_output: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    producer:
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: user_center_group
+#最大连接数
+http:
+  maxTotal: 100
+#并发数
+  defaultMaxPerRoute: 20
+#创建连接的最长时间
+  connectTimeout: 1000
+#从连接池中获取到连接的最长时间
+  connectionRequestTimeout: 500
+#数据传输的最长时间
+  socketTimeout: 10000
+debug: false

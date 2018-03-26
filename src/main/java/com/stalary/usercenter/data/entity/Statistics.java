@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.Date;
@@ -36,8 +38,19 @@ public class Statistics extends BaseEntity {
     private Long loginCount;
 
     /**
+     * 最近一次登陆ip
+     */
+    private String ip;
+
+    /**
+     * 最近一次登陆的城市
+     */
+    private String city;
+
+    /**
      * 最近一次登陆的时间
      */
+    @UpdateTimestamp
     private Date lateLoginTime;
 
 }
