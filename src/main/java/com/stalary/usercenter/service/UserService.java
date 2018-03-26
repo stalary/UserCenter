@@ -87,7 +87,7 @@ public class UserService extends BaseService<User, UserRepo> {
         String ip = httpService.getIp(request);
         String city = httpService.getAddress(ip);
         // 打入消息队列，异步统计
-        UserStat userStat = new UserStat(user.getId(), ip, city, new Date());
+        UserStat userStat = new UserStat(user.getId(), city, new Date());
         producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
         // 返回token
         return DigestUtil.Encrypt(user.getId() + UCUtil.SPLIT + user.getProjectId());
@@ -140,7 +140,7 @@ public class UserService extends BaseService<User, UserRepo> {
             // todo:当城市不同时，打入消息队列异步发送警告邮件
         }
         // 打入消息队列，异步统计
-        UserStat userStat = new UserStat(oldUser.getId(), ip, city, new Date());
+        UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
         producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
         // 返回token
         return DigestUtil.Encrypt(oldUser.getId() + UCUtil.SPLIT + oldUser.getProjectId());

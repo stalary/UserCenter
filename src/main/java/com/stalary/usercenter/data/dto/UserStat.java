@@ -22,12 +22,7 @@ public class UserStat {
     private Long userId;
 
     /**
-     * 最近一次登陆的ip
-     */
-    private String ip;
-
-    /**
-     * 最近一次登陆的城市
+     * 登陆的城市
      */
     private String city;
 
