@@ -46,6 +46,7 @@ public class Consumer {
         if (record.key() != null) {
             key = record.key().toString();
         }
+
         String message = record.value().toString();
         if (LOGIN_STAT.equals(topic)) {
             UserStat userStat = gson.fromJson(message, UserStat.class);
