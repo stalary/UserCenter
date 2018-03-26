@@ -172,8 +172,14 @@ public class HttpService {
             if (str.contains("city")) {
                 JSONObject jsonObject = JSON.parseObject(str);
                 city = jsonObject.getOrDefault("city", "").toString();
+                if (StringUtils.isBlank(city)) {
+                    city = jsonObject.getOrDefault("province", "").toString();
+                }
+                if (StringUtils.isBlank(city)) {
+                    city = jsonObject.getOrDefault("country", "").toString();
+                }
             }
         }
-        return city;
+        return StringUtils.isBlank(city) ? "济南" : city;
     }
 }

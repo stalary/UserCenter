@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.stalary.usercenter.data.dto.Address;
 import com.stalary.usercenter.factory.BeansFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -53,7 +54,7 @@ public class Stat extends BaseEntity {
 
     @Transient
     @JsonIgnore
-    private Map<String, Integer> cityMap;
+    private List<Address> cityList;
 
     /**
      * 最近一次登陆的时间
@@ -61,45 +62,17 @@ public class Stat extends BaseEntity {
     @UpdateTimestamp
     private Date lateLoginTime;
 
-    public Map<String, Integer> getCityMap() {
+    public List<Address> getCityList() {
         if (StringUtils.isBlank(this.city)) {
-            return new HashMap<>();
+            return new ArrayList<>();
         }
-        this.cityMap = BeansFactory.getGson().fromJson(city, new TypeToken<Map<String, Integer>>(){}.getType());
-        return cityMap;
+        this.cityList = BeansFactory.getGson().fromJson(city, new TypeToken<List<Address>>(){}.getType());
+        return cityList;
     }
 
-    public void setCityMap(Map<String, Integer> cityMap) {
-        Map<String, Integer> sortMap = sort(cityMap);
-        this.city = BeansFactory.getGson().toJson(sortMap);
-    }
-
-    @Transient
-    @JsonIgnore
-    public Map<String, Integer> sort(Map<String, Integer> cityMap) {
-        ValueComparator valueComparator = new ValueComparator(cityMap);
-        Map<String, Integer> sortMap = new TreeMap<>(valueComparator);
-        sortMap.putAll(cityMap);
-        return sortMap;
+    public void setCityList(List<Address> addressList) {
+        addressList.sort(Comparator.comparing(Address::getCount).reversed());
+        this.city = BeansFactory.getGson().toJson(addressList);
     }
 
 }
-
-class ValueComparator implements Comparator<String> {
-    Map<String, Integer> base;
-
-    public ValueComparator(Map<String, Integer> base) {
-        this.base = base;
-    }
-
-
-    @Override
-    public int compare(String a, String b) {
-        if (base.get(a) >= base.get(b)) {
-            return -1;
-        } else {
-            return 1;
-        }
-    }
-}
-

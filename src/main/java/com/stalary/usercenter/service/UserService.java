@@ -14,6 +14,7 @@ import com.stalary.usercenter.utils.DigestUtil;
 import com.stalary.usercenter.utils.PasswordUtil;
 import com.stalary.usercenter.utils.TimeUtil;
 import com.stalary.usercenter.utils.UCUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import java.util.Date;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
+@Slf4j
 public class UserService extends BaseService<User, UserRepo> {
 
     @Resource
@@ -136,7 +138,8 @@ public class UserService extends BaseService<User, UserRepo> {
         String ip = httpService.getIp(request);
         String city = httpService.getAddress(ip);
         Stat stat = statService.findByUserId(oldUser.getId());
-        if ( !city.equals(stat.getCity())) {
+        if (!city.equals(stat.getCityList().get(0).getAddress())) {
+            log.warn("异地登陆！" + city);
             // todo:当城市不同时，打入消息队列异步发送警告邮件
         }
         // 打入消息队列，异步统计
