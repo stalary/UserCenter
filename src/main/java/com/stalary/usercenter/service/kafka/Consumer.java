@@ -8,9 +8,7 @@ package com.stalary.usercenter.service.kafka;
 
 import com.google.gson.Gson;
 import com.stalary.usercenter.data.dto.UserStat;
-import com.stalary.usercenter.data.entity.Statistics;
-import com.stalary.usercenter.data.entity.User;
-import com.stalary.usercenter.service.StatisticsService;
+import com.stalary.usercenter.service.StatService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -36,7 +34,7 @@ public class Consumer {
     private Gson gson;
 
     @Resource
-    private StatisticsService statisticsService;
+    private StatService statService;
 
     @KafkaListener(topics = {LOGIN_STAT})
     public void process(ConsumerRecord record) {
@@ -50,7 +48,7 @@ public class Consumer {
         String message = record.value().toString();
         if (LOGIN_STAT.equals(topic)) {
             UserStat userStat = gson.fromJson(message, UserStat.class);
-            statisticsService.saveUserStat(userStat);
+            statService.saveUserStat(userStat);
         }
         long endTime = System.currentTimeMillis();
         log.info("SubmitConsumer.time=" + (endTime - startTime));

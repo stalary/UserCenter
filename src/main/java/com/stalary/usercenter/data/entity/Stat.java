@@ -25,7 +25,7 @@ import java.util.Date;
 @Table(name = "statistics")
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Statistics extends BaseEntity {
+public class Stat extends BaseEntity {
 
     /**
      * 关联的用户id

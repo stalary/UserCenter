@@ -17,4 +17,8 @@ public class TicketService extends BaseService<Ticket, TicketRepo> {
     public TicketService(TicketRepo repo) {
         super(repo);
     }
+
+    public Ticket findByUserId(Long userId) {
+        return repo.findByUserId(userId);
+    }
 }

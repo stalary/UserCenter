@@ -40,7 +40,11 @@ public class TokenController {
         return ResponseMessage.successMessage(userService.tokenRegister(user, request));
     }
 
-    /*@PostMapping("/login")
+    @PostMapping("/login")
     @ApiOperation(value = "登陆", notes = "传入用户名和密码")
-    public ResponseMessage login()*/
+    public ResponseMessage login(
+            @RequestBody @ApiParam(name = "用户登陆的对象", value = "传入用户名和密码和项目id，如果记住密码remember传true") User user,
+            HttpServletRequest request) {
+        return ResponseMessage.successMessage(userService.tokenLogin(user, request));
+    }
 }
