@@ -17,7 +17,7 @@ and I need to apply for a project id for you.
 
 # How to use it
 
-> go http://47.94.248.38:7200/swagger-ui.html(Shortly after the domain name Will update)
+> go [server](http://47.94.248.38:7200/swagger-ui.html)(Shortly after the domain name Will update)
 
 > use /facade/project input your project name it will return:
 ```
