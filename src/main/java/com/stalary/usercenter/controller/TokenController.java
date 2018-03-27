@@ -1,7 +1,7 @@
 
 package com.stalary.usercenter.controller;
 
-import com.stalary.usercenter.data.ResponseMessage;
+import com.stalary.usercenter.data.dto.ResponseMessage;
 import com.stalary.usercenter.data.entity.User;
 import com.stalary.usercenter.service.UserService;
 import io.swagger.annotations.Api;

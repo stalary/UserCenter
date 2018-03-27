@@ -1,6 +1,6 @@
 package com.stalary.usercenter.controller;
 
-import com.stalary.usercenter.data.ResponseMessage;
+import com.stalary.usercenter.data.dto.ResponseMessage;
 import com.stalary.usercenter.service.kafka.Producer;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;

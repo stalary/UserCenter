@@ -6,12 +6,11 @@
  */
 package com.stalary.usercenter.controller;
 
-import com.stalary.usercenter.data.ResponseMessage;
+import com.stalary.usercenter.data.dto.ResponseMessage;
 import com.stalary.usercenter.service.ProjectService;
 import com.stalary.usercenter.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

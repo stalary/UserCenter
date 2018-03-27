@@ -1,5 +1,6 @@
-package com.stalary.usercenter.data;
+package com.stalary.usercenter.data.dto;
 
+import com.stalary.usercenter.data.ResultEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

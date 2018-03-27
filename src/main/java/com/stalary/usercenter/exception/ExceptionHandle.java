@@ -1,6 +1,6 @@
 package com.stalary.usercenter.exception;
 
-import com.stalary.usercenter.data.ResponseMessage;
+import com.stalary.usercenter.data.dto.ResponseMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

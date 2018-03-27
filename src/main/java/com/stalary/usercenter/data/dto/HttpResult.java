@@ -1,4 +1,4 @@
-package com.stalary.usercenter.data;
+package com.stalary.usercenter.data.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
