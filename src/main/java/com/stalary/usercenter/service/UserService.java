@@ -198,7 +198,7 @@ public class UserService extends BaseService<User, UserRepo> {
         if (!projectService.verify(Long.valueOf(split[1]), key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
-        return repo.findByIdAndStatusGreaterThan(Long.valueOf(split[0]), 0);
+        return repo.findByIdAndStatusGreaterThanEqual(Long.valueOf(split[0]), 0);
     }
 
 }

@@ -1,10 +1,10 @@
 server:
-  port: 8200
+  port: 7200
   tomcat:
     uri-encoding: UTF-8
 spring:
   datasource:
-    jdbc-url: jdbc:mysql://120.24.5.178:3306/userCenter?characterEncoding=utf-8&useSSL=false
+    jdbc-url: jdbc:mysql://127.0.0.1:3306/userCenter?characterEncoding=utf-8&useSSL=false
     username: root
     password: li197910
     driver-class-name: com.mysql.jdbc.Driver

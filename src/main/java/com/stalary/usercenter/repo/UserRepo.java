@@ -22,5 +22,5 @@ public interface UserRepo extends BaseRepo<User, Long> {
 
     User findByEmailAndProjectIdAndStatusGreaterThanEqual(String email, Long projectId, Integer status);
 
-    User findByIdAndStatusGreaterThan(Long id, Integer status);
+    User findByIdAndStatusGreaterThanEqual(Long id, Integer status);
 }
