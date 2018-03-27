@@ -17,16 +17,20 @@ and I need to apply for a project id for you.
 
 # How to use it
 
-1. go http://47.94.248.38:7200/swagger-ui.html(Shortly after the domain name Will update)
-2. use /facade/project input your project name it will return:
+> go http://47.94.248.38:7200/swagger-ui.html(Shortly after the domain name Will update)
+
+> use /facade/project input your project name it will return:
 ```
 "data": {
     "projectId": 1,
     "key": "5c175866c8"
   }
 ```
-3. please save projectId and key in your db or cache
-4. use /token/register to register，at least you input
+> please save projectId and key in your db or cache
+
+## Token
+
+> use /token/register to register，at least you input
 ```
 {
   "password": "123456",
@@ -36,11 +40,30 @@ and I need to apply for a project id for you.
 }
 key: 5c175866c8
 ```
-it will return
+> it will return
 ```
 "data": "c970209b8df0419c6712cb96f1fbc58dde9bedd233f3e79c069b4be1eeaafee4"
-```   
-5. you can get user information by token, please use /facade/token   
-you need input your token and key
+``` 
+  
+> you can get user information by token
 
+> please use /facade/token   
+
+> you need input your token and key.
+
+> it will return 
+```
+"data": {
+    "id": 1,
+    "createTime": "2018-03-27T03:25:20.000+0000",
+    "username": "stalary",
+    "password": "abb8acd50d72f5961b7440b826cdaa3b2a9129b2",
+    "projectId": 1,
+    "remember": false
+  }
+```
+
+> The ways to login
+- use /facade/token get user information save your cache
+- use /facade/token when you need user information
                               
