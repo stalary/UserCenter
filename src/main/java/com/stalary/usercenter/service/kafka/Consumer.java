@@ -1,9 +1,4 @@
-/**
- * @(#)Consumer.java, 2018-03-21.
- * <p>
- * Copyright 2018 Youdao, Inc. All rights reserved.
- * YOUDAO PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
+
 package com.stalary.usercenter.service.kafka;
 
 import com.google.gson.Gson;

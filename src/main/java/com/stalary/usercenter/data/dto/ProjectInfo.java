@@ -1,9 +1,4 @@
-/**
- * @(#)ProjectInfo.java, 2018-03-27.
- * <p>
- * Copyright 2018 Youdao, Inc. All rights reserved.
- * YOUDAO PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
+
 package com.stalary.usercenter.data.dto;
 
 import lombok.AllArgsConstructor;
