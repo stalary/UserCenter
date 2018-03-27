@@ -18,8 +18,9 @@ public enum ResultEnum {
     UPDATE_PASSWORD_ERROR(1005, "信息不足，无法修改密码"),
 
     // 2开头为项目有关的错误
-    PROJECT_REPEAT(2001, "该用户已注册"),
-    PROJECT_ERROR(2002, "项目名错误"),
+    PROJECT_REJECT(2003, "密钥错误"),
+    PROJECT_REPEAT(2002, "该用户已注册"),
+    PROJECT_ERROR(2003, "项目名错误"),
 
     SUCCESS(0, "成功");
 

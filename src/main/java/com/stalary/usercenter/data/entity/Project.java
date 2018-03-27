@@ -35,6 +35,11 @@ public class Project extends BaseEntity {
     private String name;
 
     /**
+     * 每个项目对应的密钥
+     */
+    private String key;
+
+    /**
      * 状态，-1为删除，0为正常，默认为0
      */
     @JsonIgnore

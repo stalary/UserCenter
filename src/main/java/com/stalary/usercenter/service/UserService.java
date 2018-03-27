@@ -50,6 +50,9 @@ public class UserService extends BaseService<User, UserRepo> {
     @Resource
     private StatService statService;
 
+    @Resource
+    private ProjectService projectService;
+
     @Autowired
     protected UserService(UserRepo repo) {
         super(repo);
@@ -60,7 +63,10 @@ public class UserService extends BaseService<User, UserRepo> {
      * @param user
      * @return
      */
-    public String tokenRegister(User user, HttpServletRequest request) {
+    public String tokenRegister(User user, HttpServletRequest request, String key) {
+        if (!projectService.verify(user.getProjectId(), key)) {
+            throw new MyException(ResultEnum.PROJECT_REJECT);
+        }
         // 用户名为空
         if (StringUtils.isEmpty(user.getUsername())) {
             throw new MyException(ResultEnum.USERNAME_EMPTY);
@@ -92,10 +98,13 @@ public class UserService extends BaseService<User, UserRepo> {
         UserStat userStat = new UserStat(user.getId(), city, new Date());
         producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
         // 返回token
-        return DigestUtil.Encrypt(user.getId() + UCUtil.SPLIT + user.getProjectId());
+        return DigestUtil.Encrypt(user.getId().toString() + UCUtil.SPLIT + user.getProjectId());
     }
 
-    public String tokenLogin(User user, HttpServletRequest request) {
+    public String tokenLogin(User user, HttpServletRequest request, String key) {
+        if (!projectService.verify(user.getProjectId(), key)) {
+            throw new MyException(ResultEnum.PROJECT_REJECT);
+        }
         // 用户名为空
         if (StringUtils.isEmpty(user.getUsername())) {
             throw new MyException(ResultEnum.USERNAME_EMPTY);
@@ -146,10 +155,13 @@ public class UserService extends BaseService<User, UserRepo> {
         UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
         producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
         // 返回token
-        return DigestUtil.Encrypt(oldUser.getId() + UCUtil.SPLIT + oldUser.getProjectId());
+        return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
     }
 
-    public String tokenUpdate(User user) {
+    public String tokenUpdate(User user, String key) {
+        if (!projectService.verify(user.getProjectId(), key)) {
+            throw new MyException(ResultEnum.PROJECT_REJECT);
+        }
         // 用户名为空
         if (StringUtils.isEmpty(user.getUsername())) {
             throw new MyException(ResultEnum.USERNAME_EMPTY);
@@ -177,6 +189,16 @@ public class UserService extends BaseService<User, UserRepo> {
         }
         oldUser.setPassword(PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()));
         repo.save(oldUser);
-        return DigestUtil.Encrypt(oldUser.getId() + UCUtil.SPLIT + oldUser.getProjectId());
+        return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
     }
+
+    public User findByToken(String token, String key) {
+        String decrypt = DigestUtil.Decrypt(token);
+        String[] split = decrypt.split(UCUtil.SPLIT);
+        if (!projectService.verify(Long.valueOf(split[1]), key)) {
+            throw new MyException(ResultEnum.PROJECT_REJECT);
+        }
+        return repo.findByIdAndStatusGreaterThan(Long.valueOf(split[0]), 0);
+    }
+
 }

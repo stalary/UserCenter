@@ -7,15 +7,14 @@
 package com.stalary.usercenter.controller;
 
 import com.stalary.usercenter.data.ResponseMessage;
-import com.stalary.usercenter.data.entity.User;
 import com.stalary.usercenter.service.ProjectService;
+import com.stalary.usercenter.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -32,6 +31,9 @@ public class FacadeController {
     @Resource
     private ProjectService projectService;
 
+    @Resource
+    private UserService userService;
+
     @PostMapping("/project")
     @ApiOperation(value = "注册", notes = "传入项目名")
     public ResponseMessage register(
@@ -44,6 +46,14 @@ public class FacadeController {
     public ResponseMessage getInfo(
             @RequestParam String name) {
         return ResponseMessage.successMessage(projectService.get(name));
+    }
+
+    @GetMapping("/token")
+    @ApiOperation(value = "通过token获取用户信息", notes = "传入token")
+    public ResponseMessage getUser(
+            @RequestParam String token,
+            @RequestParam String key) {
+        return ResponseMessage.successMessage(userService.findByToken(token, key));
     }
 
 }

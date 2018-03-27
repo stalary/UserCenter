@@ -26,8 +26,6 @@ import javax.annotation.Resource;
 @Component
 public class Consumer {
 
-    public static final String USER_CENTER_GROUP = "user_center_group";
-
     public static final String LOGIN_STAT = "login_stat";
 
     @Resource
