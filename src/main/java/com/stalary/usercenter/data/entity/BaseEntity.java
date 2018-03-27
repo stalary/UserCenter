@@ -33,6 +33,7 @@ public abstract class BaseEntity implements Serializable {
      */
     @JsonIgnore
     @UpdateTimestamp
+    @ApiModelProperty(hidden=true)
     private Date updateTime;
 
     /**

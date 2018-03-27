@@ -84,13 +84,13 @@ public class UserService extends BaseService<User, UserRepo> {
         user.setSalt(salt);
         user.setPassword(PasswordUtil.getPassword(user.getPassword(), salt));
         repo.save(user);
-        // 下发ticket
+        /*// 下发ticket
         Ticket ticket = new Ticket();
         ticket.setUserId(user.getId());
         // 默认失效时间为一天
         ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
         ticket.setTicket(PasswordUtil.get10UUID());
-        ticketService.save(ticket);
+        ticketService.save(ticket);*/
         // 获取ip和地址
         String ip = httpService.getIp(request);
         String city = httpService.getAddress(ip);
@@ -122,8 +122,8 @@ public class UserService extends BaseService<User, UserRepo> {
         if (!PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()).equals(oldUser.getPassword())) {
             throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR);
         }
-        // 更新ticket
-        Ticket ticket = ticketService.findByUserId(user.getId());
+        /*// 更新ticket
+        Ticket ticket = ticketService.findByUserId(oldUser.getId());
         if (ticket != null) {
             // 默认失效时间为一天，保存密码时保留三十天
             if (user.isRemember()) {
@@ -142,13 +142,14 @@ public class UserService extends BaseService<User, UserRepo> {
             }
             ticket.setUserId(oldUser.getId());
             ticket.setTicket(PasswordUtil.get10UUID());
-        }
+            ticketService.save(ticket);
+        }*/
         // 获取ip和地址
         String ip = httpService.getIp(request);
         String city = httpService.getAddress(ip);
         Stat stat = statService.findByUserId(oldUser.getId());
         if (!city.equals(stat.getCityList().get(0).getAddress())) {
-            log.warn("异地登陆！" + city);
+            log.warn(user.getUsername() + "异地登陆！" + city);
             // todo:当城市不同时，打入消息队列异步发送警告邮件
         }
         // 打入消息队列，异步统计
