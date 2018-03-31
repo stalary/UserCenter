@@ -36,6 +36,11 @@
 			<artifactId>spring-kafka</artifactId>
 			<version>2.1.4.RELEASE</version>
 		</dependency>
+		<!-- Spring Boot 邮件服务 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
