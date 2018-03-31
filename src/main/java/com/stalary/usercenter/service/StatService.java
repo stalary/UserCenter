@@ -1,14 +1,18 @@
 package com.stalary.usercenter.service;
 
+import com.stalary.usercenter.data.ResultEnum;
 import com.stalary.usercenter.data.dto.Address;
 import com.stalary.usercenter.data.dto.UserStat;
 import com.stalary.usercenter.data.entity.Stat;
+import com.stalary.usercenter.data.entity.User;
+import com.stalary.usercenter.exception.MyException;
 import com.stalary.usercenter.repo.StatRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +27,12 @@ import java.util.Map;
 @Service
 @Slf4j
 public class StatService extends BaseService<Stat, StatRepo> {
+
+    @Resource
+    private ProjectService projectService;
+
+    @Resource
+    private UserService userService;
 
     @Autowired
     protected StatService(StatRepo repo) {
@@ -58,6 +68,17 @@ public class StatService extends BaseService<Stat, StatRepo> {
             newStat.setCityList(addressList);
             repo.save(newStat);
         }
+    }
+
+    public List<Stat> findByProjectId(Long projectId, String key) {
+        // 验证密钥
+        if (!projectService.verify(projectId, key)) {
+            throw new MyException(ResultEnum.PROJECT_REJECT);
+        }
+        List<User> userList = userService.findByProjectId(projectId);
+        List<Stat> statList = new ArrayList<>(userList.size());
+        userList.forEach(user -> statList.add(repo.findByUserId(user.getId())));
+        return statList;
     }
 
     public Stat findByUserId(Long userId) {

@@ -9,7 +9,7 @@ import com.stalary.usercenter.data.entity.Project;
  */
 public interface ProjectRepo extends BaseRepo<Project, Long> {
 
-    Project findByNameAndStatusGreaterThanEqual(String name, Integer status);
+    Project findByNameAndPhoneAndStatusGreaterThanEqual(String name, String phone,  Integer status);
 
     Project findByIdAndKeyAndStatusGreaterThanEqual(Long id, String key, Integer status);
 }

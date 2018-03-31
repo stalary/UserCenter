@@ -4,6 +4,7 @@ package com.stalary.usercenter.controller;
 import com.stalary.usercenter.data.dto.ResponseMessage;
 import com.stalary.usercenter.data.entity.User;
 import com.stalary.usercenter.service.UserService;
+import com.stalary.usercenter.utils.UCUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -22,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 @Api(value = "使用token进行用户操作的controller", tags = "token用户操作接口")
 @RequestMapping("/token")
 @RestController
-@Slf4j
 public class TokenController {
 
     @Resource
@@ -34,7 +34,7 @@ public class TokenController {
             @RequestBody @ApiParam(name = "用户注册的对象", value = "仅用户名，密码，项目id为必填项") User user,
             @RequestParam String key,
             HttpServletRequest request) {
-        return ResponseMessage.successMessage(userService.tokenRegister(user, request, key));
+        return ResponseMessage.successMessage(userService.register(user, request, key));
     }
 
     @PostMapping("/login")
@@ -43,7 +43,7 @@ public class TokenController {
             @RequestBody @ApiParam(name = "用户登陆的对象", value = "传入用户名和密码和项目id，如果记住密码remember传true") User user,
             @RequestParam String key,
             HttpServletRequest request) {
-        return ResponseMessage.successMessage(userService.tokenLogin(user, request, key));
+        return ResponseMessage.successMessage(userService.login(user, request, key));
     }
 
     @PostMapping("/update")
@@ -51,6 +51,6 @@ public class TokenController {
     public ResponseMessage update(
             @RequestBody @ApiParam(name = "用户修改密码的对象", value = "传入用户名和邮箱或者手机号以及新密码和项目id") User user,
             @RequestParam String key) {
-        return ResponseMessage.successMessage(userService.tokenUpdate(user, key));
+        return ResponseMessage.successMessage(userService.update(user, key));
     }
 }

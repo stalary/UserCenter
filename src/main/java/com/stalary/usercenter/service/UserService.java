@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 
 /**
  * UserService
@@ -60,10 +61,11 @@ public class UserService extends BaseService<User, UserRepo> {
 
     /**
      * 返回token的注册
+     *
      * @param user
      * @return
      */
-    public String tokenRegister(User user, HttpServletRequest request, String key) {
+    public String register(User user, HttpServletRequest request, String key) {
         if (!projectService.verify(user.getProjectId(), key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
@@ -84,13 +86,13 @@ public class UserService extends BaseService<User, UserRepo> {
         user.setSalt(salt);
         user.setPassword(PasswordUtil.getPassword(user.getPassword(), salt));
         repo.save(user);
-        /*// 下发ticket
+        // 下发ticket
         Ticket ticket = new Ticket();
         ticket.setUserId(user.getId());
         // 默认失效时间为一天
         ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
         ticket.setTicket(PasswordUtil.get10UUID());
-        ticketService.save(ticket);*/
+        ticketService.save(ticket);
         // 获取ip和地址
         String ip = httpService.getIp(request);
         String city = httpService.getAddress(ip);
@@ -101,7 +103,8 @@ public class UserService extends BaseService<User, UserRepo> {
         return DigestUtil.Encrypt(user.getId().toString() + UCUtil.SPLIT + user.getProjectId());
     }
 
-    public String tokenLogin(User user, HttpServletRequest request, String key) {
+
+    public String login(User user, HttpServletRequest request, String key) {
         if (!projectService.verify(user.getProjectId(), key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
@@ -122,7 +125,7 @@ public class UserService extends BaseService<User, UserRepo> {
         if (!PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()).equals(oldUser.getPassword())) {
             throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR);
         }
-        /*// 更新ticket
+        // 更新ticket
         Ticket ticket = ticketService.findByUserId(oldUser.getId());
         if (ticket != null) {
             // 默认失效时间为一天，保存密码时保留三十天
@@ -143,7 +146,7 @@ public class UserService extends BaseService<User, UserRepo> {
             ticket.setUserId(oldUser.getId());
             ticket.setTicket(PasswordUtil.get10UUID());
             ticketService.save(ticket);
-        }*/
+        }
         // 获取ip和地址
         String ip = httpService.getIp(request);
         String city = httpService.getAddress(ip);
@@ -159,7 +162,7 @@ public class UserService extends BaseService<User, UserRepo> {
         return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
     }
 
-    public String tokenUpdate(User user, String key) {
+    public String update(User user, String key) {
         if (!projectService.verify(user.getProjectId(), key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
@@ -190,16 +193,28 @@ public class UserService extends BaseService<User, UserRepo> {
         }
         oldUser.setPassword(PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()));
         repo.save(oldUser);
+        // 返回token
         return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
     }
 
     public User findByToken(String token, String key) {
         String decrypt = DigestUtil.Decrypt(token);
         String[] split = decrypt.split(UCUtil.SPLIT);
-        if (!projectService.verify(Long.valueOf(split[1]), key)) {
+        long userId = Long.valueOf(split[0]);
+        long projectId = Long.valueOf(split[1]);
+        // 验证密钥
+        if (!projectService.verify(projectId, key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
-        return repo.findByIdAndStatusGreaterThanEqual(Long.valueOf(split[0]), 0);
+        // 查看ticket是否过期
+        if (!ticketService.judgeTime(userId)) {
+            throw new MyException(ResultEnum.TICKET_EXPIRED);
+        }
+        return repo.findByIdAndStatusGreaterThanEqual(userId, 0);
+    }
+
+    public List<User> findByProjectId(Long projectId) {
+        return repo.findByProjectIdAndStatusGreaterThanEqual(projectId, 0);
     }
 
 }
