@@ -9,9 +9,7 @@ and I need to apply for a project id for you.
 
 > Or you can use the code build your own user center.
 
-> There are two ways to use this project.
-- use token(need save in header)
-- use cookie(need CORS)
+> you can use it by token(need save in header or parameter)
 
 > I can provide the log when you need it
 
@@ -61,6 +59,32 @@ key: 5c175866c8
     "projectId": 1,
     "remember": false
   }
+```
+
+> if you need get your project every user statistics
+
+> you can use /facade/statistics
+
+> you will receive
+```
+"data": [
+    {
+      "id": 1,
+      "createTime": "2018-03-26T17:59:53.000+0000",
+      "userId": 1,
+      "loginCount": 5,
+      "city": "[{\"address\":\"北京\",\"count\":5}]",
+      "lateLoginTime": "2018-03-27T05:29:12.000+0000"
+    },
+    {
+      "id": 2,
+      "createTime": "2018-03-27T03:42:11.000+0000",
+      "userId": 2,
+      "loginCount": 7,
+      "city": "[{\"address\":\"北京\",\"count\":6},{\"address\":\"济南\",\"count\":1}]",
+      "lateLoginTime": "2018-03-27T05:23:19.000+0000"
+    }
+  ]
 ```
 
 > The ways to login
