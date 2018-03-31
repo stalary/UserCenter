@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 
@@ -17,7 +18,7 @@ import javax.annotation.Resource;
  * @author lirongqian
  * @since 2018/03/26
  */
-@Api(value = "测试controller", tags = "用于测试")
+@ApiIgnore
 @RequestMapping("/test")
 @RestController
 @Slf4j
