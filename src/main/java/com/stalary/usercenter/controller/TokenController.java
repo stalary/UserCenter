@@ -34,7 +34,7 @@ public class TokenController {
             @RequestBody @ApiParam(name = "用户注册的对象", value = "仅用户名，密码，项目id为必填项") User user,
             @RequestParam String key,
             HttpServletRequest request) {
-        return ResponseMessage.successMessage(userService.register(user, request, key, UCUtil.TOKEN).toString());
+        return ResponseMessage.successMessage(userService.register(user, request, key));
     }
 
     @PostMapping("/login")
@@ -43,7 +43,7 @@ public class TokenController {
             @RequestBody @ApiParam(name = "用户登陆的对象", value = "传入用户名和密码和项目id，如果记住密码remember传true") User user,
             @RequestParam String key,
             HttpServletRequest request) {
-        return ResponseMessage.successMessage(userService.login(user, request, key, UCUtil.TOKEN).toString());
+        return ResponseMessage.successMessage(userService.login(user, request, key));
     }
 
     @PostMapping("/update")
@@ -51,6 +51,6 @@ public class TokenController {
     public ResponseMessage update(
             @RequestBody @ApiParam(name = "用户修改密码的对象", value = "传入用户名和邮箱或者手机号以及新密码和项目id") User user,
             @RequestParam String key) {
-        return ResponseMessage.successMessage(userService.update(user, key, UCUtil.TOKEN).toString());
+        return ResponseMessage.successMessage(userService.update(user, key));
     }
 }

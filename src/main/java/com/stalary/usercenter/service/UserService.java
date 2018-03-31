@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 
 /**
  * UserService
@@ -60,10 +61,11 @@ public class UserService extends BaseService<User, UserRepo> {
 
     /**
      * 返回token的注册
+     *
      * @param user
      * @return
      */
-    public Object register(User user, HttpServletRequest request, String key, String type) {
+    public String register(User user, HttpServletRequest request, String key) {
         if (!projectService.verify(user.getProjectId(), key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
@@ -97,17 +99,12 @@ public class UserService extends BaseService<User, UserRepo> {
         // 打入消息队列，异步统计
         UserStat userStat = new UserStat(user.getId(), city, new Date());
         producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
-        if (UCUtil.TOKEN.equals(type)) {
-            // 返回token
-            return DigestUtil.Encrypt(user.getId().toString() + UCUtil.SPLIT + user.getProjectId());
-        } else {
-            // 返回对象，用于存储到cookie中
-            return user;
-        }
+        // 返回token
+        return DigestUtil.Encrypt(user.getId().toString() + UCUtil.SPLIT + user.getProjectId());
     }
 
 
-    public Object login(User user, HttpServletRequest request, String key, String type) {
+    public String login(User user, HttpServletRequest request, String key) {
         if (!projectService.verify(user.getProjectId(), key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
@@ -161,16 +158,11 @@ public class UserService extends BaseService<User, UserRepo> {
         // 打入消息队列，异步统计
         UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
         producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
-        if (UCUtil.TOKEN.equals(type)) {
-            // 返回token
-            return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
-        } else {
-            // 返回对象，用于存储到cookie中
-            return oldUser;
-        }
+        // 返回token
+        return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
     }
 
-    public Object update(User user, String key, String type) {
+    public String update(User user, String key) {
         if (!projectService.verify(user.getProjectId(), key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
@@ -201,13 +193,8 @@ public class UserService extends BaseService<User, UserRepo> {
         }
         oldUser.setPassword(PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()));
         repo.save(oldUser);
-        if (UCUtil.TOKEN.equals(type)) {
-            // 返回token
-            return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
-        } else {
-            // 返回对象，用于存储到cookie中
-            return oldUser;
-        }
+        // 返回token
+        return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
     }
 
     public User findByToken(String token, String key) {
@@ -224,6 +211,10 @@ public class UserService extends BaseService<User, UserRepo> {
             throw new MyException(ResultEnum.TICKET_EXPIRED);
         }
         return repo.findByIdAndStatusGreaterThanEqual(userId, 0);
+    }
+
+    public List<User> findByProjectId(Long projectId) {
+        return repo.findByProjectIdAndStatusGreaterThanEqual(projectId, 0);
     }
 
 }

@@ -22,7 +22,7 @@ spring:
       serialization:
         indent_output: true
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: http://47.94.248.38:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
     producer:

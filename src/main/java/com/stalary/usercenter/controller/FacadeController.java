@@ -3,6 +3,7 @@ package com.stalary.usercenter.controller;
 
 import com.stalary.usercenter.data.dto.ResponseMessage;
 import com.stalary.usercenter.service.ProjectService;
+import com.stalary.usercenter.service.StatService;
 import com.stalary.usercenter.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,26 +29,39 @@ public class FacadeController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private StatService statService;
+
     @PostMapping("/project")
-    @ApiOperation(value = "注册", notes = "传入项目名")
+    @ApiOperation(value = "注册", notes = "传入项目名和负责人手机号")
     public ResponseMessage register(
-            @RequestParam String name) {
-        return ResponseMessage.successMessage(projectService.save(name));
+            @RequestParam String name,
+            @RequestParam String phone) {
+        return ResponseMessage.successMessage(projectService.save(name, phone));
     }
 
     @GetMapping("/project")
-    @ApiOperation(value = "获得项目信息", notes = "传入项目名")
+    @ApiOperation(value = "获得项目信息", notes = "传入项目名和负责人手机号")
     public ResponseMessage getInfo(
-            @RequestParam String name) {
-        return ResponseMessage.successMessage(projectService.get(name));
+            @RequestParam String name,
+            @RequestParam String phone) {
+        return ResponseMessage.successMessage(projectService.get(name, phone));
     }
 
     @GetMapping("/token")
-    @ApiOperation(value = "通过token获取用户信息", notes = "传入token")
+    @ApiOperation(value = "通过token获取用户信息", notes = "传入token和key")
     public ResponseMessage getUser(
             @RequestParam String token,
             @RequestParam String key) {
         return ResponseMessage.successMessage(userService.findByToken(token, key));
+    }
+
+    @GetMapping("/statistics")
+    @ApiOperation(value = "获取所有用户统计信息", notes = "传入项目id和key")
+    public ResponseMessage getAllUserStat(
+            @RequestParam Long projectId,
+            @RequestParam String key) {
+        return ResponseMessage.successMessage(statService.findByProjectId(projectId, key));
     }
 
 }

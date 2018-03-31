@@ -2,6 +2,8 @@ package com.stalary.usercenter.repo;
 
 import com.stalary.usercenter.data.entity.User;
 
+import java.util.List;
+
 /**
  * @author Stalary
  * @description
@@ -23,4 +25,6 @@ public interface UserRepo extends BaseRepo<User, Long> {
     User findByEmailAndProjectIdAndStatusGreaterThanEqual(String email, Long projectId, Integer status);
 
     User findByIdAndStatusGreaterThanEqual(Long id, Integer status);
+
+    List<User> findByProjectIdAndStatusGreaterThanEqual(Long projectId, Integer status);
 }

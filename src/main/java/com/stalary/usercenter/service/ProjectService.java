@@ -24,21 +24,22 @@ public class ProjectService extends BaseService<Project, ProjectRepo> {
         super(repo);
     }
 
-    public ProjectInfo save(String name) {
-        Project project = repo.findByNameAndStatusGreaterThanEqual(name, 0);
+    public ProjectInfo save(String name, String phone) {
+        Project project = repo.findByNameAndPhoneAndStatusGreaterThanEqual(name, phone, 0);
         if (project != null) {
             throw new MyException(ResultEnum.PROJECT_REPEAT);
         }
         project = new Project();
         project.setName(name);
+        project.setPhone(phone);
         String uuid = PasswordUtil.get10UUID();
         project.setKey(uuid);
         repo.save(project);
         return new ProjectInfo(project.getId(), uuid);
     }
 
-    public ProjectInfo get(String name) {
-        Project project = repo.findByNameAndStatusGreaterThanEqual(name, 0);
+    public ProjectInfo get(String name, String phone) {
+        Project project = repo.findByNameAndPhoneAndStatusGreaterThanEqual(name, phone,  0);
         if (project == null) {
             throw new MyException(ResultEnum.PROJECT_ERROR);
         }
