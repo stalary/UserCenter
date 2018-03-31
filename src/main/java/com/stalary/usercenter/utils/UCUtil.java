@@ -11,4 +11,8 @@ public class UCUtil {
     public static final String ADDRESS_API = "http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=";
 
     public static final String SPLIT = ":";
+
+    public static final String COOKIE = "cookie";
+
+    public static final String TOKEN = "token";
 }
