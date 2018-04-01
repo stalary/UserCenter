@@ -44,4 +44,10 @@ public class TestController {
         mailService.sendSimpleMail(address);
         return ResponseMessage.successMessage();
     }
+
+    @GetMapping("/sendLog")
+    public ResponseMessage sendLog() {
+        log.warn("发送log");
+        return ResponseMessage.successMessage();
+    }
 }
