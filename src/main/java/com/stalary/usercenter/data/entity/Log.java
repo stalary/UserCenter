@@ -28,7 +28,17 @@ public class Log extends BaseEntity {
     private String content;
 
     /**
-     * 关联的用户id
+     * 日志等级
      */
-    private Long userId;
+    private String level;
+
+    /**
+     * 日志种类
+     */
+    private Integer type;
+
+    /**
+     * 通用id
+     */
+    private Long commonId;
 }
