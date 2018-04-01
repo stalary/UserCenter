@@ -54,6 +54,9 @@ public class UserService extends BaseService<User, UserRepo> {
     @Resource
     private ProjectService projectService;
 
+    @Resource
+    private MailService mailService;
+
     @Autowired
     protected UserService(UserRepo repo) {
         super(repo);
@@ -151,9 +154,10 @@ public class UserService extends BaseService<User, UserRepo> {
         String ip = httpService.getIp(request);
         String city = httpService.getAddress(ip);
         Stat stat = statService.findByUserId(oldUser.getId());
-        if (!city.equals(stat.getCityList().get(0).getAddress())) {
+        if (!city.equals(stat.getCityList().get(0).getAddress()) && StringUtils.isNotEmpty(user.getEmail())) {
             log.warn(user.getUsername() + "异地登陆！" + city);
-            // todo:当城市不同时，打入消息队列异步发送警告邮件
+            // 发送登陆异常的邮件
+            mailService.sendSimpleMail(user.getEmail());
         }
         // 打入消息队列，异步统计
         UserStat userStat = new UserStat(oldUser.getId(), city, new Date());

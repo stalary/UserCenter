@@ -1,6 +1,7 @@
 package com.stalary.usercenter.controller;
 
 import com.stalary.usercenter.data.dto.ResponseMessage;
+import com.stalary.usercenter.service.MailService;
 import com.stalary.usercenter.service.kafka.Producer;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +28,20 @@ public class TestController {
     @Resource
     private Producer producer;
 
-    @GetMapping("/send")
+    @Resource
+    private MailService mailService;
+
+    @GetMapping("/sendKafka")
     public ResponseMessage testKafka(
             @RequestParam String message) {
         producer.send("test", message);
+        return ResponseMessage.successMessage();
+    }
+
+    @GetMapping("/sendMail")
+    public ResponseMessage testMail(
+            @RequestParam String address) {
+        mailService.sendSimpleMail(address);
         return ResponseMessage.successMessage();
     }
 }
