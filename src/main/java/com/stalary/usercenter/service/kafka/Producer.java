@@ -22,12 +22,12 @@ public class Producer {
 
 
     public void send(String topic, String message) {
-        log.info("send message: topic: " + topic + " message: " + message);
         kafkaTemplate.send(topic, message);
+        log.info("send message: topic: " + topic + " message: " + message);
     }
 
     public void send(String topic, String key, String message) {
-        log.info("send message: topic: " + topic + " key: " + key + " message: " + message);
         kafkaTemplate.send(topic, key, message);
+        log.info("send message: topic: " + topic + " key: " + key + " message: " + message);
     }
 }
