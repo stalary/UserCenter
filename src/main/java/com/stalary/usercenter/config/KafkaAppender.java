@@ -34,10 +34,6 @@ public class KafkaAppender extends AppenderBase<ILoggingEvent> {
     @Resource
     private Formatter formatter;
 
-    @Resource
-    private Gson gson;
-
-
     @Override
     public void start() {
         if (this.formatter == null) {
@@ -62,15 +58,9 @@ public class KafkaAppender extends AppenderBase<ILoggingEvent> {
         kafkaTemplate = new KafkaTemplate<>(new DefaultKafkaProducerFactory<String, String>(props));
         String logStr = this.formatter.format(event);
         if (logStr != null) {
-            ListenableFuture<SendResult<String, String>> test = kafkaTemplate.send(Consumer.LOG, logStr);
-            log.info("send message: topic: " + Consumer.LOG + " message: " + gson.toJson(log));
-            try {
-                System.out.println(test.get().getRecordMetadata());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            kafkaTemplate.send(Consumer.LOG, logStr);
+            log.info("send message: topic: " + Consumer.LOG + " message: " + logStr);
         }
-
     }
 
 }
