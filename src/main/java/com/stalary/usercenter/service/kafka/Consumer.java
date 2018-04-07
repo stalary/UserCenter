@@ -56,7 +56,7 @@ public class Consumer {
             Long commonId = Long.valueOf(split[3]);
             String content = split[4];
             // 异步存储日志
-            Log oldLog = logService.findOldLog(commonId, type);
+            Log oldLog = logService.findOldLog(commonId, type, content);
             if (oldLog != null) {
                 oldLog.setCount(oldLog.getCount() + 1);
                 logService.save(oldLog);

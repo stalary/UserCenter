@@ -22,7 +22,7 @@ public class LogService extends BaseService<Log, LogRepo> {
         super(repo);
     }
 
-    public Log findOldLog(Long commonId, String type) {
-        return repo.findByCommonIdAndType(commonId, type);
+    public Log findOldLog(Long commonId, String type, String content) {
+        return repo.findByCommonIdAndTypeAndContent(commonId, type, content);
     }
 }
