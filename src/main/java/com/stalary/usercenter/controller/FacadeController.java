@@ -64,4 +64,12 @@ public class FacadeController {
         return ResponseMessage.successMessage(statService.findByProjectId(projectId, key));
     }
 
+    @GetMapping("/role")
+    @ApiOperation(value = "获取指定角色的用户", notes = "传入项目id和key和role")
+    public ResponseMessage getByRole(
+            @RequestParam Long projectId,
+            @RequestParam String key,
+            @RequestParam Integer role) {
+        return ResponseMessage.successMessage(userService.findByRole(projectId, key, role));
+    }
 }

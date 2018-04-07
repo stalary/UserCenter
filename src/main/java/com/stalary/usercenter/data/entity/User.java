@@ -81,6 +81,12 @@ public class User extends BaseEntity {
     private boolean remember = false;
 
     /**
+     * 默认为0，代表最低普通用户，其他规则调用方自行构建
+     */
+    @ApiModelProperty("角色")
+    private Integer role;
+
+    /**
      * 状态，-1为删除，0为正常，默认为0
      */
     @JsonIgnore

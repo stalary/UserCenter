@@ -38,6 +38,8 @@ and I need to apply for a project id for you.
 }
 key: 5c175866c8
 ```
+> if you need role definition，you can input role when you register，The default is 0
+
 > it will return
 ```
 "data": "c970209b8df0419c6712cb96f1fbc58dde9bedd233f3e79c069b4be1eeaafee4"

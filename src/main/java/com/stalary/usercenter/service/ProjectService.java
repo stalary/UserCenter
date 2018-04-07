@@ -38,7 +38,6 @@ public class ProjectService extends BaseService<Project, ProjectRepo> {
         String uuid = PasswordUtil.get10UUID();
         project.setKey(uuid);
         repo.save(project);
-        log.info("user_log" + UCUtil.SPLIT + UCUtil.PROJECT + UCUtil.SPLIT + project.getId() + UCUtil.SPLIT + "项目注册成功");
         return new ProjectInfo(project.getId(), uuid);
     }
 
@@ -47,7 +46,6 @@ public class ProjectService extends BaseService<Project, ProjectRepo> {
         if (project == null) {
             throw new MyException(ResultEnum.PROJECT_ERROR);
         }
-        log.info("user_log" + UCUtil.SPLIT + UCUtil.PROJECT + UCUtil.SPLIT + project.getId() + UCUtil.SPLIT + "项目获取成功");
         return new ProjectInfo(project.getId(), project.getKey());
     }
 

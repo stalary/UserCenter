@@ -40,7 +40,6 @@ public class MailService {
         message.setCc(receiver);
         try {
             mailSender.send(message);
-            log.info("user_log" + UCUtil.SPLIT + UCUtil.MAIL + UCUtil.SPLIT + -1 + UCUtil.SPLIT + "异地警报邮件发送成功");
         } catch (MailException e) {
             log.warn("user_log" + UCUtil.SPLIT + UCUtil.MAIL + UCUtil.SPLIT + -1 + UCUtil.SPLIT + "异地警报邮件发送失败" + e);
         }

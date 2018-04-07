@@ -102,7 +102,6 @@ public class UserService extends BaseService<User, UserRepo> {
         // 打入消息队列，异步统计
         UserStat userStat = new UserStat(user.getId(), city, new Date());
         producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
-        log.info("user_log" + UCUtil.SPLIT + UCUtil.USER + UCUtil.SPLIT + user.getId() + UCUtil.SPLIT + "在" + city + "注册成功");
         // 返回token
         return DigestUtil.Encrypt(user.getId().toString() + UCUtil.SPLIT + user.getProjectId());
     }
@@ -163,7 +162,6 @@ public class UserService extends BaseService<User, UserRepo> {
         // 打入消息队列，异步统计
         UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
         producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
-        log.info("user_log" + UCUtil.SPLIT + UCUtil.USER + UCUtil.SPLIT + oldUser.getId() + UCUtil.SPLIT + "在" + city + "登陆成功");
         // 返回token
         return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
     }
@@ -199,7 +197,6 @@ public class UserService extends BaseService<User, UserRepo> {
         }
         oldUser.setPassword(PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()));
         repo.save(oldUser);
-        log.info("user_log" + UCUtil.SPLIT + UCUtil.USER + UCUtil.SPLIT + oldUser.getId() + UCUtil.SPLIT + "修改密码成功");
         // 返回token
         return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
     }
@@ -222,6 +219,13 @@ public class UserService extends BaseService<User, UserRepo> {
 
     public List<User> findByProjectId(Long projectId) {
         return repo.findByProjectIdAndStatusGreaterThanEqual(projectId, 0);
+    }
+
+    public List<User> findByRole(Long projectId, String key, Integer role) {
+        if (!projectService.verify(projectId, key)) {
+            throw new MyException(ResultEnum.PROJECT_REJECT);
+        }
+        return repo.findByProjectIdAndRoleAndStatusGreaterThanEqual(projectId, role, 0);
     }
 
 }
