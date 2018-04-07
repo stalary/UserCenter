@@ -153,17 +153,18 @@ public class HttpService {
         if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
-        log.info("ip: " + ip);
         return ip;
     }
 
+    /**
+     * http的id设置为-2
+     */
     public String getAddress(String ip) {
         String str = null;
         try {
             str = doGet(UCUtil.ADDRESS_API + ip);
-            log.info("str: " + str);
         } catch (Exception e) {
-            log.warn("get address failed！", e);
+            log.warn("user_log" + UCUtil.SPLIT + UCUtil.HTTP + UCUtil.SPLIT + -2 + UCUtil.SPLIT + ip + "获取地址失败");
         }
         String city = "";
         if (str != null) {

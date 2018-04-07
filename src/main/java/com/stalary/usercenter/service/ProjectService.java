@@ -7,6 +7,8 @@ import com.stalary.usercenter.data.entity.Project;
 import com.stalary.usercenter.exception.MyException;
 import com.stalary.usercenter.repo.ProjectRepo;
 import com.stalary.usercenter.utils.PasswordUtil;
+import com.stalary.usercenter.utils.UCUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
  * @since 2018/03/27
  */
 @Service
+@Slf4j
 public class ProjectService extends BaseService<Project, ProjectRepo> {
 
     @Autowired
@@ -35,6 +38,7 @@ public class ProjectService extends BaseService<Project, ProjectRepo> {
         String uuid = PasswordUtil.get10UUID();
         project.setKey(uuid);
         repo.save(project);
+        log.info("user_log" + UCUtil.SPLIT + UCUtil.PROJECT + UCUtil.SPLIT + project.getId() + UCUtil.SPLIT + "项目注册成功");
         return new ProjectInfo(project.getId(), uuid);
     }
 
@@ -43,6 +47,7 @@ public class ProjectService extends BaseService<Project, ProjectRepo> {
         if (project == null) {
             throw new MyException(ResultEnum.PROJECT_ERROR);
         }
+        log.info("user_log" + UCUtil.SPLIT + UCUtil.PROJECT + UCUtil.SPLIT + project.getId() + UCUtil.SPLIT + "项目获取成功");
         return new ProjectInfo(project.getId(), project.getKey());
     }
 
@@ -52,6 +57,7 @@ public class ProjectService extends BaseService<Project, ProjectRepo> {
      */
     public boolean verify(Long id, String key) {
         if (repo.findByIdAndKeyAndStatusGreaterThanEqual(id, key, 0) == null) {
+            log.warn("user_log" + UCUtil.SPLIT + UCUtil.PROJECT + UCUtil.SPLIT + id + UCUtil.SPLIT + "项目验证密钥" + key + "失败");
             return false;
         }
         return true;

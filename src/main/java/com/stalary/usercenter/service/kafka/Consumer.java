@@ -3,7 +3,10 @@ package com.stalary.usercenter.service.kafka;
 
 import com.google.gson.Gson;
 import com.stalary.usercenter.data.dto.UserStat;
+import com.stalary.usercenter.data.entity.Log;
+import com.stalary.usercenter.service.LogService;
 import com.stalary.usercenter.service.StatService;
+import com.stalary.usercenter.utils.UCUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -23,13 +26,18 @@ public class Consumer {
 
     public static final String LOGIN_STAT = "login_stat";
 
+    public static final String LOG = "center_log";
+
     @Resource
     private Gson gson;
 
     @Resource
     private StatService statService;
 
-    @KafkaListener(topics = {LOGIN_STAT})
+    @Resource
+    private LogService logService;
+
+    @KafkaListener(topics = {LOGIN_STAT, LOG})
     public void process(ConsumerRecord record) {
         long startTime = System.currentTimeMillis();
         String topic = record.topic();
@@ -37,11 +45,15 @@ public class Consumer {
         if (record.key() != null) {
             key = record.key().toString();
         }
-
         String message = record.value().toString();
         if (LOGIN_STAT.equals(topic)) {
             UserStat userStat = gson.fromJson(message, UserStat.class);
             statService.saveUserStat(userStat);
+        } else if (LOG.equals(topic)) {
+            String[] split = message.split(UCUtil.SPLIT);
+            // 异步存储日志
+            Log log = new Log(split[0], split[4], split[2], Long.valueOf(split[3]));
+            logService.save(log);
         }
         long endTime = System.currentTimeMillis();
         log.info("SubmitConsumer.time=" + (endTime - startTime));

@@ -23,19 +23,19 @@ import javax.persistence.Table;
 public class Log extends BaseEntity {
 
     /**
-     * 日志内容
-     */
-    private String content;
-
-    /**
      * 日志等级
      */
     private String level;
 
     /**
-     * 日志种类
+     * 日志内容
      */
-    private Integer type;
+    private String content;
+
+    /**
+     * 日志种类(user，project)
+     */
+    private String type;
 
     /**
      * 通用id

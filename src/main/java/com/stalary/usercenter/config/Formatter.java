@@ -1,6 +1,7 @@
 package com.stalary.usercenter.config;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import com.stalary.usercenter.data.entity.Log;
 
 /**
  * @author Stalary
