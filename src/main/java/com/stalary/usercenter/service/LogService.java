@@ -21,4 +21,8 @@ public class LogService extends BaseService<Log, LogRepo> {
     public LogService(LogRepo repo) {
         super(repo);
     }
+
+    public Log findOldLog(Long commonId, String type) {
+        return repo.findByCommonIdAndType(commonId, type);
+    }
 }

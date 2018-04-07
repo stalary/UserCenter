@@ -51,9 +51,19 @@ public class Consumer {
             statService.saveUserStat(userStat);
         } else if (LOG.equals(topic)) {
             String[] split = message.split(UCUtil.SPLIT);
+            String level = split[0];
+            String type = split[2];
+            Long commonId = Long.valueOf(split[3]);
+            String content = split[4];
             // 异步存储日志
-            Log log = new Log(split[0], split[4], split[2], Long.valueOf(split[3]));
-            logService.save(log);
+            Log oldLog = logService.findOldLog(commonId, type);
+            if (oldLog != null) {
+                oldLog.setCount(oldLog.getCount() + 1);
+                logService.save(oldLog);
+            } else {
+                Log log = new Log(level, content, type, commonId, 1);
+                logService.save(log);
+            }
         }
         long endTime = System.currentTimeMillis();
         log.info("SubmitConsumer.time=" + (endTime - startTime));

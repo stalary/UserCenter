@@ -91,5 +91,4 @@ public class User extends BaseEntity {
      */
     @JsonIgnore
     private Integer status = 0;
-
 }

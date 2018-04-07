@@ -126,7 +126,7 @@ public class UserService extends BaseService<User, UserRepo> {
         }
         // 密码错误
         if (!PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()).equals(oldUser.getPassword())) {
-            throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR);
+            throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR, oldUser.getId());
         }
         // 更新ticket
         Ticket ticket = ticketService.findByUserId(oldUser.getId());
@@ -212,7 +212,7 @@ public class UserService extends BaseService<User, UserRepo> {
         }
         // 查看ticket是否过期
         if (!ticketService.judgeTime(userId)) {
-            throw new MyException(ResultEnum.TICKET_EXPIRED);
+            throw new MyException(ResultEnum.TICKET_EXPIRED, userId);
         }
         return repo.findByIdAndStatusGreaterThanEqual(userId, 0);
     }
@@ -223,7 +223,7 @@ public class UserService extends BaseService<User, UserRepo> {
 
     public List<User> findByRole(Long projectId, String key, Integer role) {
         if (!projectService.verify(projectId, key)) {
-            throw new MyException(ResultEnum.PROJECT_REJECT);
+            throw new MyException(ResultEnum.PROJECT_REJECT, projectId);
         }
         return repo.findByProjectIdAndRoleAndStatusGreaterThanEqual(projectId, role, 0);
     }

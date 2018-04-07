@@ -41,4 +41,9 @@ public class Log extends BaseEntity {
      * 通用id
      */
     private Long commonId;
+
+    /**
+     * 次数
+     */
+    private Integer count = 1;
 }

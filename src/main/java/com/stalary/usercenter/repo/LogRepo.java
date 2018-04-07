@@ -9,4 +9,5 @@ import com.stalary.usercenter.data.entity.Log;
  */
 public interface LogRepo extends BaseRepo<Log, Long> {
 
+    Log findByCommonIdAndType(Long commonId, String type);
 }
