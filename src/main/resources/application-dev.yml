@@ -2,6 +2,7 @@ server:
   port: 7100
   tomcat:
     uri-encoding: UTF-8
+  max-http-header-size: 8192
 spring:
   datasource:
     jdbc-url: jdbc:mysql://127.0.0.1:3306/userCenter?characterEncoding=utf-8&useSSL=false
