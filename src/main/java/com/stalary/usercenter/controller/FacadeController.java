@@ -7,6 +7,7 @@ import com.stalary.usercenter.service.StatService;
 import com.stalary.usercenter.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -71,5 +72,14 @@ public class FacadeController {
             @RequestParam String key,
             @RequestParam Integer role) {
         return ResponseMessage.successMessage(userService.findByRole(projectId, key, role));
+    }
+
+    @GetMapping("/user")
+    @ApiOperation(value = "获得一名用户", notes = "传入用户id和key以及项目id")
+    public ResponseMessage getById(
+            @RequestParam Long userId,
+            @RequestParam String key,
+            @RequestParam Long projectId) {
+        return ResponseMessage.successMessage(userService.findById(userId, key, projectId));
     }
 }

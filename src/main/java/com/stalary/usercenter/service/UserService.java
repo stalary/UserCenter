@@ -218,6 +218,13 @@ public class UserService extends BaseService<User, UserRepo> {
         return repo.findByIdAndStatusGreaterThanEqual(userId, 0);
     }
 
+    public User findById(long userId, String key, long projectId) {
+        if (!projectService.verify(projectId, key)) {
+            throw new MyException(ResultEnum.PROJECT_REJECT, projectId);
+        }
+        return repo.findByIdAndStatusGreaterThanEqual(userId, 0);
+    }
+
     public List<User> findByProjectId(Long projectId) {
         return repo.findByProjectIdAndStatusGreaterThanEqual(projectId, 0);
     }
