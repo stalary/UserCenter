@@ -87,6 +87,18 @@ public class User extends BaseEntity {
     private Integer role;
 
     /**
+     * 预留的绑定id字段
+     */
+    @ApiModelProperty("预留id1")
+    private Long firstId;
+
+    @ApiModelProperty("预留id2")
+    private Long secondId;
+
+    @ApiModelProperty("预留id3")
+    private Long thirdId;
+
+    /**
      * 状态，-1为删除，0为正常，默认为0
      */
     @JsonIgnore
