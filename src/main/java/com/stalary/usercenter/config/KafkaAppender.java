@@ -50,7 +50,7 @@ public class KafkaAppender extends AppenderBase<ILoggingEvent> {
     @Override
     protected void append(ILoggingEvent event) {
         Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "http://47.94.248.38:9092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "http://120.24.5.178:9092");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, "1000");

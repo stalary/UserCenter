@@ -3,6 +3,7 @@ package com.stalary.usercenter.controller;
 import com.stalary.usercenter.data.dto.ResponseMessage;
 import com.stalary.usercenter.service.MailService;
 import com.stalary.usercenter.service.kafka.Producer;
+import com.stalary.usercenter.utils.UCUtil;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,7 +48,7 @@ public class TestController {
 
     @GetMapping("/sendLog")
     public ResponseMessage sendLog() {
-        log.warn("发送log");
+        log.warn("user_log" + UCUtil.SPLIT + UCUtil.PROJECT + UCUtil.SPLIT + 1 + UCUtil.SPLIT + "项目验证密钥" + 123214 + "失败");
         return ResponseMessage.successMessage();
     }
 }
