@@ -203,6 +203,7 @@ public class UserService extends BaseService<User, UserRepo> {
 
     public User findByToken(String token, String key) {
         String decrypt = DigestUtil.Decrypt(token);
+        log.info("decrypt: " + decrypt);
         String[] split = decrypt.split(UCUtil.SPLIT);
         long userId = Long.valueOf(split[0]);
         long projectId = Long.valueOf(split[1]);

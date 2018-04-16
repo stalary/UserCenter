@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -34,13 +35,13 @@ public abstract class BaseEntity implements Serializable {
     @JsonIgnore
     @UpdateTimestamp
     @ApiModelProperty(hidden=true)
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
     /**
      * 创建时间
      */
     @CreationTimestamp
     @ApiModelProperty(hidden=true)
-    private Date createTime;
+    private LocalDateTime createTime;
 
 }
