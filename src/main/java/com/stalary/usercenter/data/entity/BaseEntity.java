@@ -6,9 +6,11 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -35,13 +37,14 @@ public abstract class BaseEntity implements Serializable {
     @JsonIgnore
     @UpdateTimestamp
     @ApiModelProperty(hidden=true)
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
     /**
      * 创建时间
      */
+    @JsonIgnore
     @CreationTimestamp
     @ApiModelProperty(hidden=true)
-    private LocalDateTime createTime;
+    private Date createTime;
 
 }
