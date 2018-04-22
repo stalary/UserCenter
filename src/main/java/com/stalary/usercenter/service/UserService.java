@@ -201,6 +201,29 @@ public class UserService extends BaseService<User, UserRepo> {
         return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
     }
 
+    /**
+     * 修改用户信息
+     * @param user
+     * @param key
+     * @return
+     */
+    public String updateInfo(User user, String key) {
+        if (!projectService.verify(user.getProjectId(), key)) {
+            throw new MyException(ResultEnum.PROJECT_REJECT);
+        }
+        // 用户名为空
+        if (StringUtils.isEmpty(user.getUsername())) {
+            throw new MyException(ResultEnum.USERNAME_EMPTY);
+        }
+        // 密码为空
+        if (StringUtils.isEmpty(user.getPassword())) {
+            throw new MyException(ResultEnum.PASSWORD_EMPTY);
+        }
+        repo.save(user);
+        return DigestUtil.Encrypt(user.getId().toString() + UCUtil.SPLIT + user.getProjectId());
+
+    }
+
     public User findByToken(String token, String key) {
         String decrypt = DigestUtil.Decrypt(token);
         log.info("decrypt: " + decrypt);
