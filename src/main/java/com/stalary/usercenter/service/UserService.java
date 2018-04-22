@@ -219,8 +219,25 @@ public class UserService extends BaseService<User, UserRepo> {
         if (StringUtils.isEmpty(user.getPassword())) {
             throw new MyException(ResultEnum.PASSWORD_EMPTY);
         }
-        repo.save(user);
-        return DigestUtil.Encrypt(user.getId().toString() + UCUtil.SPLIT + user.getProjectId());
+        User oldUser = repo.findByUsernameAndProjectIdAndStatusGreaterThanEqual(user.getUsername(), user.getProjectId(), 0);
+        // 用户名错误
+        if (oldUser == null) {
+            throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR);
+        }
+        // 密码错误
+        if (!PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()).equals(oldUser.getPassword())) {
+            throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR, oldUser.getId());
+        }
+        oldUser.setAvatar(user.getAvatar());
+        oldUser.setEmail(user.getEmail());
+        oldUser.setFirstId(user.getFirstId());
+        oldUser.setSecondId(user.getSecondId());
+        oldUser.setThirdId(user.getThirdId());
+        oldUser.setNickname(user.getNickname());
+        oldUser.setPhone(user.getPhone());
+        oldUser.setRole(user.getRole());
+        repo.save(oldUser);
+        return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
 
     }
 

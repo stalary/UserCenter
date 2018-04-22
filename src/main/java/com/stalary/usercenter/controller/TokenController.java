@@ -46,7 +46,7 @@ public class TokenController {
         return ResponseMessage.successMessage(userService.login(user, request, key));
     }
 
-    @PostMapping("/update")
+    @PostMapping("/update/password")
     @ApiOperation(value = "修改密码", notes = "传入用户修改密码对象和密钥")
     public ResponseMessage update(
             @RequestBody @ApiParam(name = "用户修改密码的对象", value = "传入用户名和邮箱或者手机号以及新密码和项目id") User user,
@@ -54,7 +54,7 @@ public class TokenController {
         return ResponseMessage.successMessage(userService.update(user, key));
     }
 
-    @PostMapping("update/info")
+    @PostMapping("update")
     @ApiOperation(value = "修改信息", notes = "传入用户对象，进行修改信息")
     public ResponseMessage updateInfo(
             @RequestBody User user,
