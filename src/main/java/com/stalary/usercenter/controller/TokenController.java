@@ -54,7 +54,7 @@ public class TokenController {
         return ResponseMessage.successMessage(userService.update(user, key));
     }
 
-    @PostMapping("update")
+    @PostMapping("/update")
     @ApiOperation(value = "修改信息", notes = "传入用户对象，进行修改信息")
     public ResponseMessage updateInfo(
             @RequestBody User user,
