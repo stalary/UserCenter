@@ -1,5 +1,6 @@
 package com.stalary.usercenter.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.codec.Hex;
 import org.apache.shiro.crypto.AesCipherService;
 
@@ -12,6 +13,7 @@ import java.util.Arrays;
  * @author lirongqian
  * @since 2018/02/09
  */
+@Slf4j
 public class DigestUtil {
     private static byte[] bytes;
     private static AesCipherService aesCipherService;
@@ -47,6 +49,7 @@ public class DigestUtil {
      * 解密
      */
     public static String Decrypt(String value) {
+        log.info("value: " + value);
         return new String(aesCipherService.decrypt(
                 Hex.decode(value), bytes).getBytes());
     }

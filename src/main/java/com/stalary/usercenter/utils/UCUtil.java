@@ -22,4 +22,6 @@ public class UCUtil {
 
     public static final String HTTP = "http";
 
+    public static final String KAFKA_INFO = "kafka_info";
+
 }

@@ -27,3 +27,4 @@ target
 hs_err_pid*
 mvnw
 mvnw.cmd
+application-prod.yml

@@ -178,7 +178,7 @@ public class UserService extends BaseService<User, UserRepo> {
         if (StringUtils.isEmpty(user.getPassword())) {
             throw new MyException(ResultEnum.PASSWORD_EMPTY);
         }
-        User oldUser;
+        User oldUser = null;
         // 用户名错误
         if (repo.findByUsernameAndProjectIdAndStatusGreaterThanEqual(user.getUsername(), user.getProjectId(), 0) == null) {
             throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR);
@@ -186,9 +186,11 @@ public class UserService extends BaseService<User, UserRepo> {
         // 通过手机号或者邮箱修改密码
         if (StringUtils.isNotEmpty(user.getPhone())) {
             oldUser = repo.findByPhoneAndProjectIdAndStatusGreaterThanEqual(user.getPhone(), user.getProjectId(), 0);
-        } else if (StringUtils.isNotEmpty(user.getEmail())) {
+        }
+        if (oldUser == null && StringUtils.isNotEmpty(user.getEmail())) {
             oldUser = repo.findByEmailAndProjectIdAndStatusGreaterThanEqual(user.getPhone(), user.getProjectId(), 0);
-        } else {
+        }
+        if (StringUtils.isNotEmpty(user.getPhone()) && StringUtils.isNotEmpty(user.getEmail())){
             // 当手机号和邮箱都为空时，无法修改密码
             throw new MyException(ResultEnum.UPDATE_PASSWORD_ERROR);
         }
@@ -225,7 +227,7 @@ public class UserService extends BaseService<User, UserRepo> {
             throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR);
         }
         // 密码错误
-        if (!PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()).equals(oldUser.getPassword())) {
+        if (!PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()).equals(oldUser.getPassword()) && !oldUser.getPassword().equals(user.getPassword())) {
             throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR, oldUser.getId());
         }
         oldUser.setAvatar(user.getAvatar());

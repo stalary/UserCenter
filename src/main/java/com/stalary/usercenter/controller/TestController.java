@@ -2,6 +2,7 @@ package com.stalary.usercenter.controller;
 
 import com.stalary.usercenter.data.dto.ResponseMessage;
 import com.stalary.usercenter.service.MailService;
+import com.stalary.usercenter.service.kafka.Consumer;
 import com.stalary.usercenter.service.kafka.Producer;
 import com.stalary.usercenter.utils.UCUtil;
 import io.swagger.annotations.Api;
@@ -21,7 +22,6 @@ import javax.annotation.Resource;
  * @since 2018/03/26
  */
 @ApiIgnore
-@RequestMapping("/test")
 @RestController
 @Slf4j
 public class TestController {
@@ -50,5 +50,10 @@ public class TestController {
     public ResponseMessage sendLog() {
         log.warn("user_log" + UCUtil.SPLIT + UCUtil.PROJECT + UCUtil.SPLIT + 1 + UCUtil.SPLIT + "项目验证密钥" + 123214 + "失败");
         return ResponseMessage.successMessage();
+    }
+
+    @GetMapping("/kafkaState")
+    public ResponseMessage getKafka() {
+        return ResponseMessage.successMessage(Consumer.map.get(UCUtil.KAFKA_INFO));
     }
 }
