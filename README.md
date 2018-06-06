@@ -13,6 +13,13 @@ and I need to apply for a project id for you.
 
 > I can provide the log when you need it
 
+
+# technology
+1. use three machines to provide service
+2. use kafka to produce async log
+3. use mysql save data
+4. use spring boot build this project
+
 # How to use it
 
 > go [server](http://usercenter.stalary.com/swagger-ui.html)
