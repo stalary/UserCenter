@@ -1,5 +1,6 @@
 package com.stalary.usercenter.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,11 +36,13 @@ public class Log extends BaseEntity {
     /**
      * 日志种类(user，project)
      */
+    @JsonIgnore
     private String type;
 
     /**
      * 通用id
      */
+    @JsonIgnore
     private Long commonId;
 
     /**

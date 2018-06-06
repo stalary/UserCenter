@@ -2,6 +2,7 @@
 package com.stalary.usercenter.controller;
 
 import com.stalary.usercenter.data.dto.ResponseMessage;
+import com.stalary.usercenter.service.LogService;
 import com.stalary.usercenter.service.ProjectService;
 import com.stalary.usercenter.service.StatService;
 import com.stalary.usercenter.service.UserService;
@@ -32,6 +33,9 @@ public class FacadeController {
 
     @Resource
     private StatService statService;
+
+    @Resource
+    private LogService logService;
 
     @PostMapping("/project")
     @ApiOperation(value = "注册", notes = "传入项目名和负责人手机号")
@@ -81,6 +85,14 @@ public class FacadeController {
             @RequestParam String key,
             @RequestParam Long projectId) {
         return ResponseMessage.successMessage(userService.findById(userId, key, projectId));
+    }
+
+    @GetMapping("/log")
+    @ApiOperation(value = "查看项目产生的所有错误日志", notes = "传入key以及项目id")
+    public ResponseMessage getLog(
+            @RequestParam String key,
+            @RequestParam Long projectId) {
+        return ResponseMessage.successMessage(logService.findProjectLog(key, projectId));
     }
 
 }

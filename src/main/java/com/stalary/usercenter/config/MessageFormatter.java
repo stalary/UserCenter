@@ -1,8 +1,6 @@
 package com.stalary.usercenter.config;
 
-import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import com.stalary.usercenter.data.entity.Log;
 import com.stalary.usercenter.utils.UCUtil;
 
 /**

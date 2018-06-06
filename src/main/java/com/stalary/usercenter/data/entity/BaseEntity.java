@@ -1,5 +1,6 @@
 package com.stalary.usercenter.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -34,9 +35,9 @@ public abstract class BaseEntity implements Serializable {
     /**
      * 最后更新时间
      */
-    @JsonIgnore
     @UpdateTimestamp
     @ApiModelProperty(hidden=true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
     /**
