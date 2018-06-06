@@ -90,8 +90,8 @@ public class FacadeController {
     @GetMapping("/log")
     @ApiOperation(value = "查看项目产生的所有错误日志", notes = "传入key以及项目id")
     public ResponseMessage getLog(
-            @RequestParam String key,
-            @RequestParam Long projectId) {
+            @RequestParam Long projectId,
+            @RequestParam String key) {
         return ResponseMessage.successMessage(logService.findProjectLog(key, projectId));
     }
 

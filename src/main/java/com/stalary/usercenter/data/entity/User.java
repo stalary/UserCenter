@@ -64,6 +64,7 @@ public class User extends BaseEntity {
      * 密码
      */
     @ApiModelProperty("密码")
+    @JsonIgnore
     private String password;
 
     /**
@@ -80,6 +81,7 @@ public class User extends BaseEntity {
 
     @Transient
     @ApiModelProperty("是否记住密码")
+    @JsonIgnore
     private boolean remember = false;
 
     /**

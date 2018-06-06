@@ -2,6 +2,7 @@ package com.stalary.usercenter.service;
 
 import com.stalary.usercenter.data.ResultEnum;
 import com.stalary.usercenter.data.dto.Address;
+import com.stalary.usercenter.data.dto.StatInfo;
 import com.stalary.usercenter.data.dto.UserStat;
 import com.stalary.usercenter.data.entity.Stat;
 import com.stalary.usercenter.data.entity.User;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * StatisticsService
@@ -70,15 +72,23 @@ public class StatService extends BaseService<Stat, StatRepo> {
         }
     }
 
-    public List<Stat> findByProjectId(Long projectId, String key) {
+    public List<StatInfo> findByProjectId(Long projectId, String key) {
         // 验证密钥
         if (!projectService.verify(projectId, key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
-        List<User> userList = userService.findByProjectId(projectId);
-        List<Stat> statList = new ArrayList<>(userList.size());
-        userList.forEach(user -> statList.add(repo.findByUserId(user.getId())));
-        return statList;
+        List<Long> userIdList = userService
+                .findByProjectId(projectId)
+                .stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
+        return repo.findStatList(userIdList)
+                .stream()
+                .map(stat -> {
+                    stat.getCityList();
+                    return new StatInfo(stat, userService.findOne(stat.getUserId()));
+                })
+                .collect(Collectors.toList());
     }
 
     public Stat findByUserId(Long userId) {

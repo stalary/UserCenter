@@ -40,6 +40,7 @@ public class Stat extends BaseEntity {
     /**
      * 关联的用户id
      */
+    @JsonIgnore
     private Long userId;
 
     /**
@@ -50,17 +51,11 @@ public class Stat extends BaseEntity {
     /**
      * 登陆的城市
      */
+    @JsonIgnore
     private String city;
 
     @Transient
-    @JsonIgnore
     private List<Address> cityList;
-
-    /**
-     * 最近一次登陆的时间
-     */
-    @UpdateTimestamp
-    private Date lateLoginTime;
 
     public List<Address> getCityList() {
         if (StringUtils.isBlank(this.city)) {
