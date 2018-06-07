@@ -33,14 +33,6 @@ public abstract class BaseEntity implements Serializable {
     private Long id;
 
     /**
-     * 最后更新时间
-     */
-    @UpdateTimestamp
-    @ApiModelProperty(hidden=true)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updateTime;
-
-    /**
      * 创建时间
      */
     @JsonIgnore

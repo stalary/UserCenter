@@ -17,7 +17,7 @@ public interface StatRepo extends BaseRepo<Stat, Long> {
      * @param userId
      * @return
      */
-    @Query("select s from Stat s where s.userId in ?1")
+    @Query("select s from Stat s where s.userId in ?1 order by s.lateLoginTime desc")
     List<Stat> findStatList(List<Long> userId);
 
     /**

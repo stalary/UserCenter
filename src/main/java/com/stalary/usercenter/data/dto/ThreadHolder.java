@@ -1,8 +1,7 @@
 /**
- * @(#)ThreadHolder.java, 2018-05-22.
+ * @(#)ThreadHolder.java, 2018-06-06.
  * <p>
- * Copyright 2018 Youdao, Inc. All rights reserved.
- * YOUDAO PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ * Copyright 2018 Stalary.
  */
 package com.stalary.usercenter.data.dto;
 
@@ -22,7 +21,7 @@ public class ThreadHolder {
     /**
      * 线程id
      */
-    private Long id;
+    private Integer id;
 
     /**
      * 线程名称

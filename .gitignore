@@ -19,6 +19,7 @@
 *.zip
 *.tar.gz
 *.rar
+*.sh
 build
 src/target
 target
