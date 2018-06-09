@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -53,7 +50,7 @@ public class ConsumerGroup {
             topicMap.put(topic, concurrency);
         }
         if (concurrency >= 1) {
-            this.executor = Executors.newFixedThreadPool(concurrency);
+            this.executor = Executors.newFixedThreadPool(concurrency * topicList.length);
             int threadNum = 0;
             for (String topic : topicMap.keySet()) {
                 executor.submit(new ConsumerThread(config, topic, ++threadNum));
