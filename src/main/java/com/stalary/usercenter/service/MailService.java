@@ -1,14 +1,9 @@
 package com.stalary.usercenter.service;
 
-import com.stalary.usercenter.utils.UCUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -25,7 +20,6 @@ import java.util.Properties;
 @Service
 @Slf4j
 public class MailService {
-
 
     private final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
 

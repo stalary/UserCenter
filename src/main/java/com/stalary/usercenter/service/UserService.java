@@ -154,6 +154,13 @@ public class UserService extends BaseService<User, UserRepo> {
         String ip = httpService.getIp(request);
         String city = httpService.getAddress(ip);
         Stat stat = statService.findByUserId(oldUser.getId());
+        if (stat == null) {
+            // 打入消息队列，异步统计
+            UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
+            producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
+            // 返回token
+            return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
+        }
         if (!city.equals(stat.getCityList().get(0).getAddress()) && StringUtils.isNotEmpty(user.getEmail())) {
             log.warn(user.getUsername() + "异地登陆！" + city);
             // 发送登陆异常的邮件
