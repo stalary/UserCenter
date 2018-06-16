@@ -154,6 +154,7 @@ public class UserService extends BaseService<User, UserRepo> {
         String ip = httpService.getIp(request);
         String city = httpService.getAddress(ip);
         Stat stat = statService.findByUserId(oldUser.getId());
+        // 当无统计信息时，不需要判断异地登陆
         if (stat == null) {
             // 打入消息队列，异步统计
             UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
