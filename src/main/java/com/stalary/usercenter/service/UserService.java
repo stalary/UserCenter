@@ -218,6 +218,7 @@ public class UserService extends BaseService<User, UserRepo> {
      * @return
      */
     public String updateInfo(User user, String key) {
+        // 验证密钥
         if (!projectService.verify(user.getProjectId(), key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
