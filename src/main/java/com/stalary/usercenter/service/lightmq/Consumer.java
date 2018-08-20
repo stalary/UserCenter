@@ -1,5 +1,5 @@
 
-package com.stalary.usercenter.service.kafka;
+package com.stalary.usercenter.service.lightmq;
 
 import com.google.gson.Gson;
 import com.stalary.lightmqclient.MQListener;

@@ -3,7 +3,7 @@ package com.stalary.usercenter.controller;
 import com.stalary.lightmqclient.facade.Producer;
 import com.stalary.usercenter.data.dto.ResponseMessage;
 import com.stalary.usercenter.service.MailService;
-import com.stalary.usercenter.service.kafka.Consumer;
+import com.stalary.usercenter.service.lightmq.Consumer;
 import com.stalary.usercenter.utils.UCUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;

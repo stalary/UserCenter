@@ -2,18 +2,13 @@ package com.stalary.usercenter.config;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
-import com.stalary.lightmqclient.JsonResponse;
 import com.stalary.lightmqclient.LightMQProperties;
 import com.stalary.lightmqclient.WebClientService;
 import com.stalary.lightmqclient.facade.Producer;
-import com.stalary.usercenter.service.kafka.Consumer;
+import com.stalary.usercenter.service.lightmq.Consumer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * KafkaAppender

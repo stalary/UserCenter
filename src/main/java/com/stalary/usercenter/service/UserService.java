@@ -9,7 +9,7 @@ import com.stalary.usercenter.data.entity.Ticket;
 import com.stalary.usercenter.data.entity.User;
 import com.stalary.usercenter.exception.MyException;
 import com.stalary.usercenter.repo.UserRepo;
-import com.stalary.usercenter.service.kafka.Consumer;
+import com.stalary.usercenter.service.lightmq.Consumer;
 import com.stalary.usercenter.utils.DigestUtil;
 import com.stalary.usercenter.utils.PasswordUtil;
 import com.stalary.usercenter.utils.TimeUtil;
