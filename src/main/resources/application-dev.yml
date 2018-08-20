@@ -51,3 +51,8 @@ http:
 #数据传输的最长时间
   socketTimeout: 10000
 debug: false
+com:
+  stalary:
+    lightmq:
+      group: usercenter
+      url: http://120.24.5.178:8001

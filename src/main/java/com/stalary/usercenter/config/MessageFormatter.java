@@ -2,6 +2,7 @@ package com.stalary.usercenter.config;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.stalary.usercenter.utils.UCUtil;
+import org.springframework.stereotype.Component;
 
 /**
  * MessageFormatter

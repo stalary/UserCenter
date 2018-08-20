@@ -1,6 +1,7 @@
 package com.stalary.usercenter.service;
 
 import com.google.gson.Gson;
+import com.stalary.lightmqclient.facade.Producer;
 import com.stalary.usercenter.data.ResultEnum;
 import com.stalary.usercenter.data.dto.UserStat;
 import com.stalary.usercenter.data.entity.Stat;
@@ -9,7 +10,6 @@ import com.stalary.usercenter.data.entity.User;
 import com.stalary.usercenter.exception.MyException;
 import com.stalary.usercenter.repo.UserRepo;
 import com.stalary.usercenter.service.kafka.Consumer;
-import com.stalary.usercenter.service.kafka.Producer;
 import com.stalary.usercenter.utils.DigestUtil;
 import com.stalary.usercenter.utils.PasswordUtil;
 import com.stalary.usercenter.utils.TimeUtil;

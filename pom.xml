@@ -30,12 +30,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-		<!-- spring-kafka -->
-		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka</artifactId>
-			<version>2.1.4.RELEASE</version>
-		</dependency>
 		<!-- Spring Boot 邮件服务 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -107,6 +101,13 @@
             <artifactId>gson</artifactId>
             <version>2.8.2</version>
         </dependency>
+
+		<!-- lightmq -->
+		<dependency>
+			<groupId>com.stalary</groupId>
+			<artifactId>lightmqclient</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
 
     </dependencies>
 

@@ -2,19 +2,15 @@ package com.stalary.usercenter.config;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
-import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
-import com.stalary.usercenter.data.entity.Log;
+import com.stalary.lightmqclient.JsonResponse;
+import com.stalary.lightmqclient.LightMQProperties;
+import com.stalary.lightmqclient.WebClientService;
+import com.stalary.lightmqclient.facade.Producer;
 import com.stalary.usercenter.service.kafka.Consumer;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
-import org.springframework.util.concurrent.ListenableFuture;
-import springfox.documentation.spring.web.json.Json;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,10 +25,16 @@ import java.util.Map;
 public class KafkaAppender extends AppenderBase<ILoggingEvent> {
 
     @Resource
-    private KafkaTemplate<String, String> kafkaTemplate;
-
-    @Resource
     private Formatter formatter;
+
+    Producer producer;
+
+    {
+        LightMQProperties properties = new LightMQProperties();
+        properties.setUrl("http://59.111.95.232:8001");
+        WebClientService service = new WebClientService(properties);
+        producer = new Producer(service);
+    }
 
     @Override
     public void start() {
@@ -49,16 +51,10 @@ public class KafkaAppender extends AppenderBase<ILoggingEvent> {
 
     @Override
     protected void append(ILoggingEvent event) {
-        Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "http://120.24.5.178:9092");
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, "1000");
-        props.put(ProducerConfig.RETRIES_CONFIG, 0);
-        kafkaTemplate = new KafkaTemplate<>(new DefaultKafkaProducerFactory<String, String>(props));
+
         String logStr = this.formatter.format(event);
         if (logStr != null) {
-            kafkaTemplate.send(Consumer.LOG, logStr);
+            producer.send(Consumer.LOG, logStr);
             log.info("send message: topic: " + Consumer.LOG + " message: " + logStr);
         }
     }

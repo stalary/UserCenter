@@ -1,14 +1,12 @@
 package com.stalary.usercenter.controller;
 
+import com.stalary.lightmqclient.facade.Producer;
 import com.stalary.usercenter.data.dto.ResponseMessage;
 import com.stalary.usercenter.service.MailService;
 import com.stalary.usercenter.service.kafka.Consumer;
-import com.stalary.usercenter.service.kafka.Producer;
 import com.stalary.usercenter.utils.UCUtil;
-import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
