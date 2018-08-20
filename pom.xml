@@ -11,6 +11,13 @@
 	<name>usercenter</name>
 	<description>user center developed by stalary</description>
 
+	<repositories>
+		<repository>
+			<id>oss</id>
+			<name>oss</name>
+			<url>https://oss.sonatype.org/content/groups/public</url>
+		</repository>
+	</repositories>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -25,6 +32,12 @@
 	</properties>
 
 	<dependencies>
+        <!-- lightmq -->
+        <dependency>
+            <groupId>com.stalary</groupId>
+            <artifactId>lightmqclient</artifactId>
+            <version>1.1-SNAPSHOT</version>
+        </dependency>
 		<!-- jpa -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -101,13 +114,6 @@
             <artifactId>gson</artifactId>
             <version>2.8.2</version>
         </dependency>
-
-		<!-- lightmq -->
-		<dependency>
-			<groupId>com.stalary</groupId>
-			<artifactId>lightmqclient</artifactId>
-			<version>1.1-SNAPSHOT</version>
-		</dependency>
 
     </dependencies>
 
