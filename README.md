@@ -16,7 +16,7 @@ and I need to apply for a project id for you.
 
 # technology
 1. use three machines to provide service
-2. use kafka to produce async log
+2. use lightmq to produce async log
 3. use mysql save data
 4. use spring boot build this project
 
