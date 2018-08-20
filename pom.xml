@@ -17,6 +17,14 @@
 			<name>oss</name>
 			<url>https://oss.sonatype.org/content/groups/public</url>
 		</repository>
+        <repository>
+            <!-- id必须唯一 -->
+            <id>aliyun-repository</id>
+            <!-- 见名知意即可 -->
+            <name>aliyun repository</name>
+            <!-- 仓库的url地址 -->
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+        </repository>
 	</repositories>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
