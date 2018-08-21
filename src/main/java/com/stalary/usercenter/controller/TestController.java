@@ -2,16 +2,19 @@ package com.stalary.usercenter.controller;
 
 import com.stalary.lightmqclient.facade.Producer;
 import com.stalary.usercenter.data.dto.ResponseMessage;
+import com.stalary.usercenter.service.HttpService;
 import com.stalary.usercenter.service.MailService;
 import com.stalary.usercenter.service.lightmq.Consumer;
 import com.stalary.usercenter.utils.UCUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.methods.HttpGet;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * TestController
@@ -29,6 +32,9 @@ public class TestController {
 
     @Resource
     private MailService mailService;
+
+    @Resource
+    private HttpService httpService;
 
     @GetMapping("/sendKafka")
     public ResponseMessage testKafka(
@@ -53,5 +59,12 @@ public class TestController {
     @GetMapping("/kafkaState")
     public ResponseMessage getKafka() {
         return ResponseMessage.successMessage(Consumer.map.get(UCUtil.KAFKA_INFO));
+    }
+
+    @GetMapping("/address")
+    public ResponseMessage getAddress(
+            HttpServletRequest request) {
+        String ip = httpService.getIp(request);
+        return ResponseMessage.successMessage(httpService.getAddress(ip));
     }
 }

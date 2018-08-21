@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * HttpService
@@ -156,29 +158,22 @@ public class HttpService {
         return ip;
     }
 
-    /**
-     * http的id设置为-2
-     */
     public String getAddress(String ip) {
-        String str = null;
+        String address = "济南";
         try {
-            str = doGet(UCUtil.ADDRESS_API + ip);
-        } catch (Exception e) {
-            log.warn("user_log" + UCUtil.SPLIT + UCUtil.HTTP + UCUtil.SPLIT + -2 + UCUtil.SPLIT + ip + "获取地址失败");
-        }
-        String city = "";
-        if (str != null) {
-            if (str.contains("city")) {
-                JSONObject jsonObject = JSON.parseObject(str);
-                city = jsonObject.getOrDefault("city", "").toString();
-                if (StringUtils.isBlank(city)) {
-                    city = jsonObject.getOrDefault("province", "").toString();
-                }
-                if (StringUtils.isBlank(city)) {
-                    city = jsonObject.getOrDefault("country", "").toString();
-                }
+            address = doGet("http://whois.pconline.com.cn/ipJson.jsp?ip=" + ip);
+            Pattern compile = Pattern.compile("(\\{\".*\"\\})");
+            Matcher matcher = compile.matcher(address);
+            if (matcher.find()) {
+                address = matcher.group();
+                JSONObject jsonObject = JSONObject.parseObject(address);
+                return jsonObject.getString("city");
+            } else {
+                return "济南";
             }
+        } catch (Exception e) {
+            log.warn("get address error", e);
         }
-        return StringUtils.isBlank(city) ? "济南" : city;
+        return address;
     }
 }
