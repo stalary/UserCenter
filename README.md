@@ -1,5 +1,8 @@
 # UserCenter
 
+# structure
+![架构图](https://upload-images.jianshu.io/upload_images/9252736-05e63bd417a0d91e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 > A easy login/register/update user center.
 
 > you can use it to finish register or login or update.
