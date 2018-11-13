@@ -2,6 +2,7 @@ package com.stalary.usercenter.repo;
 
 import com.stalary.usercenter.data.entity.Stat;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
  * @description
  * @date 2018/3/26
  */
+@Repository
 public interface StatRepo extends BaseRepo<Stat, Long> {
 
     /**

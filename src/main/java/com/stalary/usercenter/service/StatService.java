@@ -37,8 +37,8 @@ public class StatService extends BaseService<Stat, StatRepo> {
     private UserService userService;
 
     @Autowired
-    protected StatService(StatRepo repo) {
-        super(repo);
+    protected StatService(StatRepo statRepo) {
+        super(statRepo);
     }
 
     public void saveUserStat(UserStat userStat) {

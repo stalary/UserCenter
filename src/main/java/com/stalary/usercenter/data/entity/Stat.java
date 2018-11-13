@@ -23,11 +23,11 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * UserStat
- *
- * @author lirongqian
- * @since 2018/03/25
- */
+ * @model Stat
+ * @description 统计对象
+ * @field loginCount 登陆次数
+ * @field cityList 登陆城市列表
+ **/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
