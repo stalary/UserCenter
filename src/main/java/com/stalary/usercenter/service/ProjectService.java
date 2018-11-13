@@ -23,8 +23,8 @@ import org.springframework.stereotype.Service;
 public class ProjectService extends BaseService<Project, ProjectRepo> {
 
     @Autowired
-    protected ProjectService(ProjectRepo repo) {
-        super(repo);
+    protected ProjectService(ProjectRepo projectRepo) {
+        super(projectRepo);
     }
 
     public ProjectInfo save(String name, String phone) {

@@ -16,8 +16,8 @@ import java.util.Date;
 @Service
 public class TicketService extends BaseService<Ticket, TicketRepo> {
 
-    public TicketService(TicketRepo repo) {
-        super(repo);
+    public TicketService(TicketRepo ticketRepo) {
+        super(ticketRepo);
     }
 
     public Ticket findByUserId(Long userId) {

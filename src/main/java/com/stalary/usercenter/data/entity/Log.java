@@ -2,11 +2,8 @@ package com.stalary.usercenter.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Entity;
@@ -14,14 +11,15 @@ import javax.persistence.Table;
 import java.util.Date;
 
 /**
- * Log
- *
- * @author lirongqian
- * @since 2018/03/24
- */
+ * @model Log
+ * @description 日志对象
+ * @field level 日志等级
+ * @field content 日志内容
+ * @field commonId 日志种类(user|project)
+ * @field count 通用id
+ * @field level 次数
+ **/
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "log")
 @Entity
@@ -62,11 +60,13 @@ public class Log extends BaseEntity {
         this.count = count;
     }
 
+    public Log() {
+    }
+
     /**
      * 最后更新时间
      */
     @UpdateTimestamp
-    @ApiModelProperty(hidden=true)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 

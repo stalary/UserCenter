@@ -1,6 +1,7 @@
 package com.stalary.usercenter.repo;
 
 import com.stalary.usercenter.data.entity.User;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ import java.util.List;
  * @description
  * @date 2018/3/25
  */
+@Repository
 public interface UserRepo extends BaseRepo<User, Long> {
 
     /**

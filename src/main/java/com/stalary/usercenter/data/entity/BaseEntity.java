@@ -1,7 +1,6 @@
 package com.stalary.usercenter.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -27,7 +26,6 @@ public abstract class BaseEntity implements Serializable {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(hidden = true)
     private Long id;
 
     /**
@@ -35,7 +33,6 @@ public abstract class BaseEntity implements Serializable {
      */
     @JsonIgnore
     @CreationTimestamp
-    @ApiModelProperty(hidden=true)
     private Date createTime;
 
 }

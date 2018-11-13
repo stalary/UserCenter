@@ -1,7 +1,9 @@
 package com.stalary.usercenter.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.stalary.lightmqclient.facade.Producer;
+import com.stalary.usercenter.client.OutClient;
 import com.stalary.usercenter.data.ResultEnum;
 import com.stalary.usercenter.data.dto.UserStat;
 import com.stalary.usercenter.data.entity.Stat;
@@ -24,6 +26,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * UserService
@@ -46,9 +50,6 @@ public class UserService extends BaseService<User, UserRepo> {
     private TicketService ticketService;
 
     @Resource
-    private HttpService httpService;
-
-    @Resource
     private StatService statService;
 
     @Resource
@@ -57,9 +58,12 @@ public class UserService extends BaseService<User, UserRepo> {
     @Resource
     private MailService mailService;
 
+    @Resource
+    private OutClient outClient;
+
     @Autowired
-    protected UserService(UserRepo repo) {
-        super(repo);
+    protected UserService(UserRepo userRepo) {
+        super(userRepo);
     }
 
     /**
@@ -97,8 +101,7 @@ public class UserService extends BaseService<User, UserRepo> {
         ticket.setTicket(PasswordUtil.get10UUID());
         ticketService.save(ticket);
         // 获取ip和地址
-        String ip = httpService.getIp(request);
-        String city = httpService.getAddress(ip);
+        String city = getAddress(getIp(request));
         // 打入消息队列，异步统计
         UserStat userStat = new UserStat(user.getId(), city, new Date());
         producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
@@ -151,8 +154,7 @@ public class UserService extends BaseService<User, UserRepo> {
             ticketService.save(ticket);
         }
         // 获取ip和地址
-        String ip = httpService.getIp(request);
-        String city = httpService.getAddress(ip);
+        String city = getAddress(getIp(request));
         Stat stat = statService.findByUserId(oldUser.getId());
         // 当无统计信息时，不需要判断异地登陆
         if (stat == null) {
@@ -286,5 +288,44 @@ public class UserService extends BaseService<User, UserRepo> {
         }
         return repo.findByProjectIdAndRoleAndStatusGreaterThanEqual(projectId, role, 0);
     }
+
+    /**
+     * 获取请求者的ip地址
+     * @param request
+     * @return
+     */
+    public String getIp(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
+    }
+
+    public String getAddress(String ip) {
+        String address = "济南";
+        try {
+            address = outClient.getIp(ip);
+            Pattern compile = Pattern.compile("(\\{\".*\"\\})");
+            Matcher matcher = compile.matcher(address);
+            if (matcher.find()) {
+                address = matcher.group();
+                JSONObject jsonObject = JSONObject.parseObject(address);
+                return jsonObject.getString("city");
+            } else {
+                return "济南";
+            }
+        } catch (Exception e) {
+            log.warn("get address error", e);
+        }
+        return address;
+    }
+
 
 }

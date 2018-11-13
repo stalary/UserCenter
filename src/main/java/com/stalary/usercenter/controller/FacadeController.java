@@ -6,9 +6,6 @@ import com.stalary.usercenter.service.LogService;
 import com.stalary.usercenter.service.ProjectService;
 import com.stalary.usercenter.service.StatService;
 import com.stalary.usercenter.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -16,12 +13,11 @@ import javax.annotation.Resource;
 
 /**
  * FacadeController
- *
+ * 提供对外服务的Controller
  * @author lirongqian
  * @since 2018/03/27
  */
 @RequestMapping("/facade")
-@Api(value = "对外提供的controller", tags = "提供一些基本的信息")
 @RestController
 public class FacadeController {
 
@@ -37,40 +33,66 @@ public class FacadeController {
     @Resource
     private LogService logService;
 
+    /**
+     * @method register 项目注册
+     * @param name 项目名
+     * @param phone 负责人手机号
+     * @return ProjectInfo 生成的项目信息
+     **/
     @PostMapping("/project")
-    @ApiOperation(value = "注册", notes = "传入项目名和负责人手机号")
     public ResponseMessage register(
             @RequestParam String name,
             @RequestParam String phone) {
         return ResponseMessage.successMessage(projectService.save(name, phone));
     }
 
+    /**
+     * @method getInfo 获取项目信息
+     * @param name 项目名
+     * @param phone 负责人手机号
+     * @return ProjectInfo 生成的项目信息
+     **/
     @GetMapping("/project")
-    @ApiOperation(value = "获得项目信息", notes = "传入项目名和负责人手机号")
     public ResponseMessage getInfo(
             @RequestParam String name,
             @RequestParam String phone) {
         return ResponseMessage.successMessage(projectService.get(name, phone));
     }
 
+    /**
+     * @method getUser 通过token获取用户信息
+     * @param token token
+     * @param key 项目的key
+     * @return User 用户对象
+     **/
     @GetMapping("/token")
-    @ApiOperation(value = "通过token获取用户信息", notes = "传入token和key")
     public ResponseMessage getUser(
             @RequestParam String token,
             @RequestParam String key) {
         return ResponseMessage.successMessage(userService.findByToken(token, key));
     }
 
+    /**
+     * @method getAllUserStat 获取当前项目的所有统计信息
+     * @param projectId  项目id
+     * @param key 项目的key
+     * @return StatInfo 统计信息
+     **/
     @GetMapping("/statistics")
-    @ApiOperation(value = "获取所有用户统计信息", notes = "传入项目id和key")
     public ResponseMessage getAllUserStat(
             @RequestParam Long projectId,
             @RequestParam String key) {
         return ResponseMessage.successMessage(statService.findByProjectId(projectId, key));
     }
 
+    /**
+     * @method getByRole 获取项目中指定角色的所有用户
+     * @param projectId 项目id
+     * @param key 项目的key
+     * @param role 角色id
+     * @return User 用户对象
+     **/
     @GetMapping("/role")
-    @ApiOperation(value = "获取指定角色的用户", notes = "传入项目id和key和role")
     public ResponseMessage getByRole(
             @RequestParam Long projectId,
             @RequestParam String key,
@@ -78,17 +100,28 @@ public class FacadeController {
         return ResponseMessage.successMessage(userService.findByRole(projectId, key, role));
     }
 
+    /**
+     * @method getById 通过id获取用户信息
+     * @param userId 用户id
+     * @param projectId 项目id
+     * @param key 项目的key
+     * @return User 用户对象
+     **/
     @GetMapping("/user")
-    @ApiOperation(value = "获得一名用户", notes = "传入用户id和key以及项目id")
     public ResponseMessage getById(
             @RequestParam Long userId,
-            @RequestParam String key,
-            @RequestParam Long projectId) {
+            @RequestParam Long projectId,
+            @RequestParam String key) {
         return ResponseMessage.successMessage(userService.findById(userId, key, projectId));
     }
 
+    /**
+     * @method getLog 获取当前项目的所有日志
+     * @param projectId 项目id
+     * @param key 项目的key
+     * @return Log 日志对象
+     **/
     @GetMapping("/log")
-    @ApiOperation(value = "查看项目产生的所有错误日志", notes = "传入key以及项目id")
     public ResponseMessage getLog(
             @RequestParam Long projectId,
             @RequestParam String key) {

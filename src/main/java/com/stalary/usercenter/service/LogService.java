@@ -1,18 +1,15 @@
 package com.stalary.usercenter.service;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.stalary.usercenter.data.entity.Log;
 import com.stalary.usercenter.data.entity.User;
-import com.stalary.usercenter.repo.BaseRepo;
 import com.stalary.usercenter.repo.LogRepo;
 import com.stalary.usercenter.utils.UCUtil;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,7 +53,7 @@ public class LogService extends BaseService<Log, LogRepo> {
                     .collect(Collectors.toList());
             // 查找项目日志
             List<Log> projectLog = repo
-                    .findLogByProject(UCUtil.PROJECT, Lists.newArrayList(projectId))
+                    .findLogByProject(UCUtil.PROJECT, Collections.singletonList(projectId))
                     .stream()
                     .peek(log -> log.setContent(UCUtil.PROJECT + UCUtil.SPLIT + log.getCommonId() + log.getContent()))
                     .collect(Collectors.toList());
@@ -64,6 +61,6 @@ public class LogService extends BaseService<Log, LogRepo> {
             userLog.addAll(projectLog);
             return userLog;
         }
-        return Lists.newArrayList();
+        return new ArrayList<>();
     }
 }
