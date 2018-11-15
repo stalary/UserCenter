@@ -1,11 +1,11 @@
 package com.stalary.usercenter.data.entity;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.gson.reflect.TypeToken;
 import com.stalary.usercenter.data.dto.Address;
-import com.stalary.usercenter.factory.BeansFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -69,13 +69,13 @@ public class Stat extends BaseEntity {
         if (StringUtils.isBlank(this.city)) {
             return new ArrayList<>();
         }
-        this.cityList = BeansFactory.getGson().fromJson(city, new TypeToken<List<Address>>(){}.getType());
+        this.cityList = JSONObject.parseObject(city, new TypeReference<List<Address>>(){});
         return cityList;
     }
 
     public void setCityList(List<Address> addressList) {
         addressList.sort(Comparator.comparing(Address::getCount).reversed());
-        this.city = BeansFactory.getGson().toJson(addressList);
+        this.city = JSONObject.toJSONString(addressList);
     }
 
 }

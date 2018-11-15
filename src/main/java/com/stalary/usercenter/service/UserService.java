@@ -1,7 +1,6 @@
 package com.stalary.usercenter.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
 import com.stalary.lightmqclient.facade.Producer;
 import com.stalary.usercenter.client.OutClient;
 import com.stalary.usercenter.data.ResultEnum;
@@ -42,9 +41,6 @@ public class UserService extends BaseService<User, UserRepo> {
 
     @Resource
     private Producer producer;
-
-    @Resource
-    private Gson gson;
 
     @Resource
     private TicketService ticketService;
@@ -104,7 +100,7 @@ public class UserService extends BaseService<User, UserRepo> {
         String city = getAddress(getIp(request));
         // 打入消息队列，异步统计
         UserStat userStat = new UserStat(user.getId(), city, new Date());
-        producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
+        producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
         // 返回token
         return DigestUtil.Encrypt(user.getId().toString() + UCUtil.SPLIT + user.getProjectId());
     }
@@ -160,7 +156,7 @@ public class UserService extends BaseService<User, UserRepo> {
         if (stat == null) {
             // 打入消息队列，异步统计
             UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
-            producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
+            producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
             // 返回token
             return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
         }
@@ -171,7 +167,7 @@ public class UserService extends BaseService<User, UserRepo> {
         }
         // 打入消息队列，异步统计
         UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
-        producer.send(Consumer.LOGIN_STAT, gson.toJson(userStat));
+        producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
         // 返回token
         return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
     }

@@ -5,7 +5,7 @@
 
     <groupId>com.stalary</groupId>
     <artifactId>usercenter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <packaging>jar</packaging>
 
     <name>usercenter</name>
@@ -34,6 +34,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+        <docker.image.prefix>stalary</docker.image.prefix>
     </properties>
 
     <dependencies>
@@ -95,23 +96,11 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.7</version>
         </dependency>
-        <!-- httpclient -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.5</version>
-        </dependency>
         <!-- fastjson -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.47</version>
-        </dependency>
-        <!-- gson -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.2</version>
         </dependency>
         <!-- easydoc -->
         <dependency>
@@ -127,6 +116,24 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <!-- Docker maven plugin -->
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <dockerDirectory>src/main/docker</dockerDirectory>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+            <!-- Docker maven plugin -->
             <plugin>
                 <groupId>com.stalary</groupId>
                 <artifactId>easydoc-maven-plugin</artifactId>
