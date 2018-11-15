@@ -1,7 +1,7 @@
 
 package com.stalary.usercenter.service.lightmq;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSONObject;
 import com.stalary.lightmqclient.MQListener;
 import com.stalary.lightmqclient.MessageDto;
 import com.stalary.lightmqclient.facade.MQConsumer;
@@ -33,16 +33,9 @@ public class Consumer implements MQConsumer {
 
     public static final String LOG = "center_log";
 
-    private static Gson gson;
-
     private static StatService statService;
 
     private static LogService logService;
-
-    @Autowired
-    public void setGson(Gson gson) {
-        Consumer.gson = gson;
-    }
 
     @Autowired
     public void setStatService(StatService statService) {
@@ -64,7 +57,7 @@ public class Consumer implements MQConsumer {
             String topic = messageDto.getTopic();
             String message = messageDto.getValue();
             if (LOGIN_STAT.equals(topic)) {
-                UserStat userStat = gson.fromJson(message, UserStat.class);
+                UserStat userStat = JSONObject.parseObject(message, UserStat.class);
                 statService.saveUserStat(userStat);
             } else if (LOG.equals(topic)) {
                 String[] split = message.split(UCUtil.SPLIT);
