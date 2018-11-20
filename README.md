@@ -18,7 +18,7 @@ and I need to apply for a project id for you.
 
 # deploy way
 1. mvn clean install & java -jar target/usercenter-0.1.jar
-2. docker run --name usercenter -p 7200:7200 -d stalary/usercenter
+2. docker run --name usercenter -p 7200:7200 -d stalary/usercenter --com.stalary.lightmq.consumer=false  --com.stalary.lightmq.group=master
 
 # technology
 1. use three machines to provide service
