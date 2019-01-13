@@ -5,7 +5,7 @@ import com.stalary.usercenter.data.dto.ResponseMessage;
 import com.stalary.usercenter.service.MailService;
 import com.stalary.usercenter.service.UserService;
 import com.stalary.usercenter.service.lightmq.Consumer;
-import com.stalary.usercenter.utils.UCUtil;
+import com.stalary.usercenter.data.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -49,13 +49,13 @@ public class TestController {
 
     @GetMapping("/sendLog")
     public ResponseMessage sendLog() {
-        log.warn("user_log" + UCUtil.SPLIT + UCUtil.PROJECT + UCUtil.SPLIT + 1 + UCUtil.SPLIT + "项目验证密钥" + 123214 + "失败");
+        log.warn("user_log" + Constant.SPLIT + Constant.PROJECT + Constant.SPLIT + 1 + Constant.SPLIT + "项目验证密钥" + 123214 + "失败");
         return ResponseMessage.successMessage();
     }
 
     @GetMapping("/kafkaState")
     public ResponseMessage getKafka() {
-        return ResponseMessage.successMessage(Consumer.map.get(UCUtil.KAFKA_INFO));
+        return ResponseMessage.successMessage(Consumer.map.get(Constant.KAFKA_INFO));
     }
 
     @GetMapping("/address")

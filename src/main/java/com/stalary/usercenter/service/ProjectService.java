@@ -4,13 +4,18 @@ package com.stalary.usercenter.service;
 import com.stalary.usercenter.data.ResultEnum;
 import com.stalary.usercenter.data.dto.ProjectInfo;
 import com.stalary.usercenter.data.entity.Project;
+import com.stalary.usercenter.data.vo.ProjectVo;
 import com.stalary.usercenter.exception.MyException;
 import com.stalary.usercenter.repo.ProjectRepo;
+import com.stalary.usercenter.data.Constant;
 import com.stalary.usercenter.utils.PasswordUtil;
 import com.stalary.usercenter.utils.UCUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * ProjectService
@@ -38,6 +43,7 @@ public class ProjectService extends BaseService<Project, ProjectRepo> {
         String uuid = PasswordUtil.get10UUID();
         project.setKey(uuid);
         repo.save(project);
+        log.info(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, project.getId(), "项目注册"));
         return new ProjectInfo(project.getId(), uuid);
     }
 
@@ -46,7 +52,12 @@ public class ProjectService extends BaseService<Project, ProjectRepo> {
         if (project == null) {
             throw new MyException(ResultEnum.PROJECT_ERROR);
         }
+        log.info(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, project.getId(), "获取项目信息"));
         return new ProjectInfo(project.getId(), project.getKey());
+    }
+
+    public List<ProjectVo> findAll() {
+        return repo.findAll().stream().map(p -> new ProjectVo(p.getName(), p.getCreateTime())).collect(Collectors.toList());
     }
 
     /**
@@ -55,7 +66,7 @@ public class ProjectService extends BaseService<Project, ProjectRepo> {
      */
     public boolean verify(Long id, String key) {
         if (repo.findByIdAndKeyAndStatusGreaterThanEqual(id, key, 0) == null) {
-            log.warn("user_log" + UCUtil.SPLIT + UCUtil.PROJECT + UCUtil.SPLIT + id + UCUtil.SPLIT + "项目验证密钥" + key + "失败");
+            log.warn(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, id, "项目验证密钥" + key + "失败"));
             return false;
         }
         return true;

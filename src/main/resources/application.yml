@@ -1,6 +1,10 @@
 spring:
   profiles:
     active: prod
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+  application:
+    name: usercenter
 server:
   tomcat:
     accesslog:
@@ -12,3 +16,4 @@ server:
       file-date-format: .yyyy-MM-dd
       request-attributes-enabled: true
     basedir: user_center_tomcat
+  max-http-header-size: 8192

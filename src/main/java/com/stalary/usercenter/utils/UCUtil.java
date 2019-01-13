@@ -1,27 +1,26 @@
+/**
+ * @(#)UCUtil.java, 2019-01-13.
+ *
+ * Copyright 2019 Stalary.
+ */
 package com.stalary.usercenter.utils;
+
+import com.stalary.usercenter.data.Constant;
 
 /**
  * UCUtil
- * 用户中心的工具类，包括常量的存放
+ *
  * @author lirongqian
- * @since 2018/03/25
+ * @since 2019/01/13
  */
 public class UCUtil {
 
-    public static final String ADDRESS_API = "http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=";
-
-    public static final String SPLIT = ":";
-
-    public static final String USER_LOG = "user_log";
-
-    public static final String USER = "user";
-
-    public static final String PROJECT = "project";
-
-    public static final String MAIL = "mail";
-
-    public static final String HTTP = "http";
-
-    public static final String KAFKA_INFO = "kafka_info";
-
+    public static String genLog(Object... content) {
+        StringBuilder sb = new StringBuilder();
+        for (Object str : content) {
+            sb.append(str).append(Constant.SPLIT);
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
 }

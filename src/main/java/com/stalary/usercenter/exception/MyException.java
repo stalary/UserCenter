@@ -2,7 +2,7 @@ package com.stalary.usercenter.exception;
 
 
 import com.stalary.usercenter.data.ResultEnum;
-import com.stalary.usercenter.utils.UCUtil;
+import com.stalary.usercenter.data.Constant;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,7 +25,7 @@ public class MyException extends RuntimeException {
     public MyException(ResultEnum resultEnum, Long id) {
         super(resultEnum.getMsg());
         this.code = resultEnum.getCode();
-        log.warn("user_log" + UCUtil.SPLIT + UCUtil.USER + UCUtil.SPLIT + id + UCUtil.SPLIT + resultEnum.getMsg());
+        log.warn(Constant.USER_LOG + Constant.SPLIT + Constant.USER + Constant.SPLIT + id + Constant.SPLIT + resultEnum.getMsg());
     }
 
 }

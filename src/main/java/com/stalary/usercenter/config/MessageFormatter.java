@@ -1,8 +1,7 @@
 package com.stalary.usercenter.config;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import com.stalary.usercenter.utils.UCUtil;
-import org.springframework.stereotype.Component;
+import com.stalary.usercenter.data.Constant;
 
 /**
  * MessageFormatter
@@ -13,8 +12,8 @@ import org.springframework.stereotype.Component;
 public class MessageFormatter implements Formatter {
     @Override
     public String format(ILoggingEvent event) {
-        if (event.getFormattedMessage().startsWith(UCUtil.USER_LOG)) {
-            return event.getLevel().toString() + UCUtil.SPLIT + event.getFormattedMessage();
+        if (event.getFormattedMessage().startsWith(Constant.USER_LOG)) {
+            return event.getLevel().toString() + Constant.SPLIT + event.getFormattedMessage();
         } else {
             return null;
         }

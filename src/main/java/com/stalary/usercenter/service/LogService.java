@@ -1,16 +1,16 @@
 package com.stalary.usercenter.service;
 
+import com.stalary.usercenter.data.Constant;
 import com.stalary.usercenter.data.entity.Log;
 import com.stalary.usercenter.data.entity.User;
 import com.stalary.usercenter.repo.LogRepo;
 import com.stalary.usercenter.utils.UCUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
  * @since 2018/03/25
  */
 @Service
+@Slf4j
 public class LogService extends BaseService<Log, LogRepo> {
 
     @Resource
@@ -37,7 +38,10 @@ public class LogService extends BaseService<Log, LogRepo> {
         return repo.findByCommonIdAndTypeAndContent(commonId, type, content);
     }
 
-    public List<Log> findProjectLog(String key, Long projectId) {
+    public Map<String, List<Log>> findProjectLog(String key, Long projectId) {
+        List<Log> infoLog = new ArrayList<>();
+        List<Log> warnLog = new ArrayList<>();
+        List<Log> errorLog = new ArrayList<>();
         if (projectService.verify(projectId, key)) {
             List<Long> userIdList = userService
                     .findByProjectId(projectId)
@@ -47,20 +51,37 @@ public class LogService extends BaseService<Log, LogRepo> {
             // 查找用户日志
             List<Log> userLog =
                     repo
-                    .findLogByProject(UCUtil.USER, userIdList)
-                    .stream()
-                    .peek(log -> log.setContent(UCUtil.USER + UCUtil.SPLIT + log.getCommonId() + log.getContent()))
-                    .collect(Collectors.toList());
+                            .findLogByProject(Constant.USER, userIdList)
+                            .stream()
+                            .peek(log -> log.setContent("userId" + Constant.SPLIT + log.getCommonId() + log.getContent()))
+                            .collect(Collectors.toList());
             // 查找项目日志
             List<Log> projectLog = repo
-                    .findLogByProject(UCUtil.PROJECT, Collections.singletonList(projectId))
-                    .stream()
-                    .peek(log -> log.setContent(UCUtil.PROJECT + UCUtil.SPLIT + log.getCommonId() + log.getContent()))
-                    .collect(Collectors.toList());
+                    .findLogByProject(Constant.PROJECT, Collections.singletonList(projectId));
             // 合并日志
             userLog.addAll(projectLog);
-            return userLog;
+            userLog.forEach(l -> {
+                switch (l.getLevel()) {
+                    case Constant.INFO_LOG:
+                        infoLog.add(l);
+                        break;
+                    case Constant.WARN_LOG:
+                        warnLog.add(l);
+                        break;
+                    case Constant.ERROR_LOG:
+                        errorLog.add(l);
+                        break;
+                    default:
+                        break;
+                }
+            });
+            log.info(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, projectId, "查看项目所有日志"));
+
         }
-        return new ArrayList<>();
+        Map<String, List<Log>> ret = new HashMap<>();
+        ret.put(Constant.INFO_LOG, infoLog);
+        ret.put(Constant.WARN_LOG, warnLog);
+        ret.put(Constant.ERROR_LOG, errorLog);
+        return ret;
     }
 }

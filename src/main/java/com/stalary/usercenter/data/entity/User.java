@@ -58,11 +58,6 @@ public class User extends BaseEntity {
     private String phone;
 
     /**
-     * 头像(非必须)
-     */
-    private String avatar;
-
-    /**
      * 密码
      */
     private String password;

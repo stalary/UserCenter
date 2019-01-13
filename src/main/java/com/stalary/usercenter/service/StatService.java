@@ -1,23 +1,23 @@
 package com.stalary.usercenter.service;
 
+import com.stalary.usercenter.data.Constant;
 import com.stalary.usercenter.data.ResultEnum;
 import com.stalary.usercenter.data.dto.Address;
-import com.stalary.usercenter.data.dto.StatInfo;
 import com.stalary.usercenter.data.dto.UserStat;
 import com.stalary.usercenter.data.entity.Stat;
 import com.stalary.usercenter.data.entity.User;
+import com.stalary.usercenter.data.vo.StatVo;
+import com.stalary.usercenter.data.vo.UserVo;
 import com.stalary.usercenter.exception.MyException;
 import com.stalary.usercenter.repo.StatRepo;
+import com.stalary.usercenter.utils.UCUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -72,7 +72,7 @@ public class StatService extends BaseService<Stat, StatRepo> {
         }
     }
 
-    public List<StatInfo> findByProjectId(Long projectId, String key) {
+    public List<StatVo> findByProjectId(Long projectId, String key) {
         // 验证密钥
         if (!projectService.verify(projectId, key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
@@ -82,11 +82,13 @@ public class StatService extends BaseService<Stat, StatRepo> {
                 .stream()
                 .map(User::getId)
                 .collect(Collectors.toList());
+        log.info(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, projectId, "查看统计信息"));
         return repo.findStatList(userIdList)
                 .stream()
                 .map(stat -> {
                     stat.getCityList();
-                    return new StatInfo(stat, userService.findOne(stat.getUserId()));
+                    User one = userService.findOne(stat.getUserId());
+                    return new StatVo(stat, new UserVo(one.getId(), one.getUsername(), one.getRole()));
                 })
                 .collect(Collectors.toList());
     }

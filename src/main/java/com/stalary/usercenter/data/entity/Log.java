@@ -1,6 +1,5 @@
 package com.stalary.usercenter.data.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -67,7 +66,6 @@ public class Log extends BaseEntity {
      * 最后更新时间
      */
     @UpdateTimestamp
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
 }

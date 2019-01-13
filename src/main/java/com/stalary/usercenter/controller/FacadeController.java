@@ -47,6 +47,15 @@ public class FacadeController {
     }
 
     /**
+     * @method getAllProject 获取所有项目信息
+     * @return ProjectVo
+     **/
+    @GetMapping("/project/all")
+    public ResponseMessage getAllProject() {
+        return ResponseMessage.successMessage(projectService.findAll());
+    }
+
+    /**
      * @method getInfo 获取项目信息
      * @param name 项目名
      * @param phone 负责人手机号
@@ -76,7 +85,7 @@ public class FacadeController {
      * @method getAllUserStat 获取当前项目的所有统计信息
      * @param projectId  项目id
      * @param key 项目的key
-     * @return StatInfo 统计信息
+     * @return StatVo 统计信息
      **/
     @GetMapping("/statistics")
     public ResponseMessage getAllUserStat(
@@ -126,6 +135,19 @@ public class FacadeController {
             @RequestParam Long projectId,
             @RequestParam String key) {
         return ResponseMessage.successMessage(logService.findProjectLog(key, projectId));
+    }
+
+    /**
+     * @method getProjectUser 获取当前项目所有用户信息
+     * @param projectId 项目id
+     * @param key 项目的key
+     * @return UserVo 用户信息
+     **/
+    @GetMapping("/user/project")
+    public ResponseMessage getProjectUser(
+            @RequestParam Long projectId,
+            @RequestParam String key) {
+        return ResponseMessage.successMessage(userService.findProjectUser(projectId, key));
     }
 
 }

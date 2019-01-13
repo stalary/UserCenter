@@ -10,7 +10,7 @@ import com.stalary.usercenter.data.dto.UserStat;
 import com.stalary.usercenter.data.entity.Log;
 import com.stalary.usercenter.service.LogService;
 import com.stalary.usercenter.service.StatService;
-import com.stalary.usercenter.utils.UCUtil;
+import com.stalary.usercenter.data.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ public class Consumer implements MQConsumer {
                 UserStat userStat = JSONObject.parseObject(message, UserStat.class);
                 statService.saveUserStat(userStat);
             } else if (LOG.equals(topic)) {
-                String[] split = message.split(UCUtil.SPLIT);
+                String[] split = message.split(Constant.SPLIT);
                 String level = split[0];
                 String type = split[2];
                 Long commonId = Long.valueOf(split[3]);

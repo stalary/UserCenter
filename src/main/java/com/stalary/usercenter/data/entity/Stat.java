@@ -2,7 +2,6 @@ package com.stalary.usercenter.data.entity;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.stalary.usercenter.data.dto.Address;
@@ -62,7 +61,6 @@ public class Stat extends BaseEntity {
      * 最近一次登陆的时间
      */
     @UpdateTimestamp
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lateLoginTime;
 
     public List<Address> getCityList() {

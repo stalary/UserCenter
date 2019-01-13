@@ -8,9 +8,11 @@ import com.stalary.usercenter.data.dto.UserStat;
 import com.stalary.usercenter.data.entity.Stat;
 import com.stalary.usercenter.data.entity.Ticket;
 import com.stalary.usercenter.data.entity.User;
+import com.stalary.usercenter.data.vo.UserVo;
 import com.stalary.usercenter.exception.MyException;
 import com.stalary.usercenter.repo.UserRepo;
 import com.stalary.usercenter.service.lightmq.Consumer;
+import com.stalary.usercenter.data.Constant;
 import com.stalary.usercenter.utils.DigestUtil;
 import com.stalary.usercenter.utils.PasswordUtil;
 import com.stalary.usercenter.utils.TimeUtil;
@@ -23,10 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * UserService
@@ -101,8 +105,9 @@ public class UserService extends BaseService<User, UserRepo> {
         // 打入消息队列，异步统计
         UserStat userStat = new UserStat(user.getId(), city, new Date());
         producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
+        log.info(UCUtil.genLog(Constant.USER_LOG, Constant.USER, user.getId(), "注册成功成功"));
         // 返回token
-        return DigestUtil.Encrypt(user.getId().toString() + UCUtil.SPLIT + user.getProjectId());
+        return DigestUtil.Encrypt(user.getId().toString() + Constant.SPLIT + user.getProjectId());
     }
 
 
@@ -158,7 +163,7 @@ public class UserService extends BaseService<User, UserRepo> {
             UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
             producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
             // 返回token
-            return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
+            return DigestUtil.Encrypt(oldUser.getId().toString() + Constant.SPLIT + oldUser.getProjectId());
         }
         if (!city.equals(stat.getCityList().get(0).getAddress()) && StringUtils.isNotEmpty(user.getEmail())) {
             log.warn(user.getUsername() + "异地登陆！" + city);
@@ -168,8 +173,9 @@ public class UserService extends BaseService<User, UserRepo> {
         // 打入消息队列，异步统计
         UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
         producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
+        log.info(UCUtil.genLog(Constant.USER_LOG, Constant.USER, oldUser.getId(), "登陆成功"));
         // 返回token
-        return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
+        return DigestUtil.Encrypt(oldUser.getId().toString() + Constant.SPLIT + oldUser.getProjectId());
     }
 
     public String update(User user, String key) {
@@ -196,7 +202,7 @@ public class UserService extends BaseService<User, UserRepo> {
         if (oldUser == null && StringUtils.isNotEmpty(user.getEmail())) {
             oldUser = repo.findByEmailAndProjectIdAndStatusGreaterThanEqual(user.getPhone(), user.getProjectId(), 0);
         }
-        if (StringUtils.isNotEmpty(user.getPhone()) && StringUtils.isNotEmpty(user.getEmail())){
+        if (StringUtils.isNotEmpty(user.getPhone()) && StringUtils.isNotEmpty(user.getEmail())) {
             // 当手机号和邮箱都为空时，无法修改密码
             throw new MyException(ResultEnum.UPDATE_PASSWORD_ERROR);
         }
@@ -206,11 +212,12 @@ public class UserService extends BaseService<User, UserRepo> {
         oldUser.setPassword(PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()));
         repo.save(oldUser);
         // 返回token
-        return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
+        return DigestUtil.Encrypt(oldUser.getId().toString() + Constant.SPLIT + oldUser.getProjectId());
     }
 
     /**
      * 修改用户信息
+     *
      * @param user
      * @param key
      * @return
@@ -237,7 +244,6 @@ public class UserService extends BaseService<User, UserRepo> {
         if (!PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()).equals(oldUser.getPassword()) && !oldUser.getPassword().equals(user.getPassword())) {
             throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR, oldUser.getId());
         }
-        oldUser.setAvatar(user.getAvatar());
         oldUser.setEmail(user.getEmail());
         oldUser.setFirstId(user.getFirstId());
         oldUser.setSecondId(user.getSecondId());
@@ -246,14 +252,14 @@ public class UserService extends BaseService<User, UserRepo> {
         oldUser.setPhone(user.getPhone());
         oldUser.setRole(user.getRole());
         repo.save(oldUser);
-        return DigestUtil.Encrypt(oldUser.getId().toString() + UCUtil.SPLIT + oldUser.getProjectId());
+        return DigestUtil.Encrypt(oldUser.getId().toString() + Constant.SPLIT + oldUser.getProjectId());
 
     }
 
     public User findByToken(String token, String key) {
         String decrypt = DigestUtil.Decrypt(token);
         log.info("decrypt: " + decrypt);
-        String[] split = decrypt.split(UCUtil.SPLIT);
+        String[] split = decrypt.split(Constant.SPLIT);
         long userId = Long.valueOf(split[0]);
         long projectId = Long.valueOf(split[1]);
         // 验证密钥
@@ -287,6 +293,7 @@ public class UserService extends BaseService<User, UserRepo> {
 
     /**
      * 获取请求者的ip地址
+     *
      * @param request
      * @return
      */
@@ -323,5 +330,14 @@ public class UserService extends BaseService<User, UserRepo> {
         return address;
     }
 
-
+    public List<UserVo> findProjectUser(Long projectId, String key) {
+        if (!projectService.verify(projectId, key)) {
+            throw new MyException(ResultEnum.PROJECT_REJECT);
+        }
+        log.info(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, projectId, "查看项目所有用户信息"));
+        return repo.findByProjectIdAndStatusGreaterThanEqual(projectId, 0)
+                .stream()
+                .map(u -> new UserVo(u.getId(), u.getUsername(), u.getRole()))
+                .collect(Collectors.toList());
+    }
 }

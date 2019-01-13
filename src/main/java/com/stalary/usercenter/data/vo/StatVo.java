@@ -3,7 +3,7 @@
  * <p>
  * Copyright 2018 Stalary.
  */
-package com.stalary.usercenter.data.dto;
+package com.stalary.usercenter.data.vo;
 
 import com.stalary.usercenter.data.entity.Stat;
 import com.stalary.usercenter.data.entity.User;
@@ -11,16 +11,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * StatInfo
+ * StatVo
  *
  * @author lirongqian
  * @since 2018/06/06
  */
 @Data
 @AllArgsConstructor
-public class StatInfo {
+public class StatVo {
 
     private Stat stat;
 
-    private User user;
+    private UserVo userVo;
 }
