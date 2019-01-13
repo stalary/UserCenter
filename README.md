@@ -28,7 +28,7 @@ and I need to apply for a project id for you.
 
 # How to use it
 
-> go [server](http://usercenter.stalary.com/swagger-ui.html)
+> go [server](http://usercenter.stalary.com/easy-doc.html)
 
 > use /facade/project input your project name it will return:
 ```
