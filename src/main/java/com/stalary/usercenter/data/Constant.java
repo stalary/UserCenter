@@ -1,8 +1,12 @@
 package com.stalary.usercenter.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Constant
  * 用户中心的工具类，包括常量的存放
+ *
  * @author lirongqian
  * @since 2018/03/25
  */
@@ -29,5 +33,9 @@ public class Constant {
     public static final String WARN_LOG = "WARN";
 
     public static final String ERROR_LOG = "ERROR";
+
+    public static final String[] ORIGIN = {
+            "http://localhost",
+            "https://120.24.5.178"};
 
 }

@@ -260,8 +260,8 @@ public class UserService extends BaseService<User, UserRepo> {
         String decrypt = DigestUtil.Decrypt(token);
         log.info("decrypt: " + decrypt);
         String[] split = decrypt.split(Constant.SPLIT);
-        long userId = Long.valueOf(split[0]);
-        long projectId = Long.valueOf(split[1]);
+        long userId = Long.parseLong(split[0]);
+        long projectId = Long.parseLong(split[1]);
         // 验证密钥
         if (!projectService.verify(projectId, key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
@@ -337,7 +337,7 @@ public class UserService extends BaseService<User, UserRepo> {
         log.info(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, projectId, "查看项目所有用户信息"));
         return repo.findByProjectIdAndStatusGreaterThanEqual(projectId, 0)
                 .stream()
-                .map(u -> new UserVo(u.getId(), u.getUsername(), u.getRole()))
+                .map(u -> new UserVo(u.getId(), u.getUsername(), u.getRole(), u.getCreateTime()))
                 .collect(Collectors.toList());
     }
 }

@@ -13,11 +13,6 @@
 
     <repositories>
         <repository>
-            <id>oss</id>
-            <name>oss</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </repository>
-        <repository>
             <id>aliyun-repository</id>
             <name>aliyun repository</name>
             <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
@@ -106,7 +101,7 @@
         <dependency>
             <groupId>com.stalary</groupId>
             <artifactId>easy-doc</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.1.0</version>
         </dependency>
     </dependencies>
 
@@ -123,6 +118,11 @@
                 <version>1.0.0</version>
                 <configuration>
                     <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <imageTags>
+                        <imageTag>0.0.1</imageTag>
+                        <imageTag>latest</imageTag>
+                    </imageTags>
+                    <forceTags>true</forceTags>
                     <dockerDirectory>src/main/docker</dockerDirectory>
                     <resources>
                         <resource>
@@ -137,6 +137,7 @@
             <plugin>
                 <groupId>com.stalary</groupId>
                 <artifactId>easydoc-maven-plugin</artifactId>
+                <version>0.1.0</version>
                 <!-- -Dpath可以替代 -->
                 <configuration>
                     <path>com.stalary.usercenter</path>

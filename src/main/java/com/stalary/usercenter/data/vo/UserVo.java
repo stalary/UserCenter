@@ -8,9 +8,15 @@ package com.stalary.usercenter.data.vo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
- * UserVo
- *
+ * @model UserVo
+ * @description 用户信息Vo
+ * @field id 用户id
+ * @field username 用户名
+ * @field role 用户角色
+ * @field createTime 用户注册时间
  * @author lirongqian
  * @since 2019/01/13
  */
@@ -18,9 +24,11 @@ import lombok.Data;
 @AllArgsConstructor
 public class UserVo {
 
-    private Long userId;
+    private Long id;
 
     private String username;
 
     private Integer role;
+
+    private Date createTime;
 }

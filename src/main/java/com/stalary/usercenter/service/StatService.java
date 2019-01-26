@@ -88,7 +88,7 @@ public class StatService extends BaseService<Stat, StatRepo> {
                 .map(stat -> {
                     stat.getCityList();
                     User one = userService.findOne(stat.getUserId());
-                    return new StatVo(stat, new UserVo(one.getId(), one.getUsername(), one.getRole()));
+                    return new StatVo(stat, new UserVo(one.getId(), one.getUsername(), one.getRole(), one.getCreateTime()));
                 })
                 .collect(Collectors.toList());
     }

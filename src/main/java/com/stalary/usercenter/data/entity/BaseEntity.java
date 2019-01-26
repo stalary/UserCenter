@@ -31,7 +31,6 @@ public abstract class BaseEntity implements Serializable {
     /**
      * 创建时间
      */
-    @JsonIgnore
     @CreationTimestamp
     private Date createTime;
 
