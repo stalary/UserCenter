@@ -1,8 +1,5 @@
 package com.stalary.usercenter.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Constant
  * 用户中心的工具类，包括常量的存放
@@ -11,8 +8,6 @@ import java.util.List;
  * @since 2018/03/25
  */
 public class Constant {
-
-    public static final String ADDRESS_API = "http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=";
 
     public static final String SPLIT = ":";
 
@@ -34,8 +29,11 @@ public class Constant {
 
     public static final String ERROR_LOG = "ERROR";
 
+    /** 配置支持跨域列表 **/
     public static final String[] ORIGIN = {
-            "http://localhost",
-            "https://120.24.5.178"};
+            "http://localhost:7300",
+            "http://120.24.5.178:7300",
+            "http://47.94.248.38:7300",
+    "http://userfe.stalary.com"};
 
 }

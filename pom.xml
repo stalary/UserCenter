@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.stalary</groupId>
             <artifactId>lightmqclient</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>0.0.1</version>
         </dependency>
         <!-- jpa -->
         <dependency>
@@ -101,7 +101,7 @@
         <dependency>
             <groupId>com.stalary</groupId>
             <artifactId>easy-doc</artifactId>
-            <version>0.1.0</version>
+            <version>0.1.1</version>
         </dependency>
     </dependencies>
 

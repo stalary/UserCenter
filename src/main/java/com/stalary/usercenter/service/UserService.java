@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -66,6 +68,9 @@ public class UserService extends BaseService<User, UserRepo> {
         super(userRepo);
     }
 
+    /** 用于执行一些异步任务 **/
+    ExecutorService exec = Executors.newFixedThreadPool(5);
+
     /**
      * 返回token的注册
      *
@@ -93,19 +98,21 @@ public class UserService extends BaseService<User, UserRepo> {
         user.setSalt(salt);
         user.setPassword(PasswordUtil.getPassword(user.getPassword(), salt));
         repo.save(user);
-        // 下发ticket
-        Ticket ticket = new Ticket();
-        ticket.setUserId(user.getId());
-        // 默认失效时间为一天
-        ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
-        ticket.setTicket(PasswordUtil.get10UUID());
-        ticketService.save(ticket);
-        // 获取ip和地址
-        String city = getAddress(getIp(request));
-        // 打入消息队列，异步统计
-        UserStat userStat = new UserStat(user.getId(), city, new Date());
-        producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
-        log.info(UCUtil.genLog(Constant.USER_LOG, Constant.USER, user.getId(), "注册成功成功"));
+        exec.execute(() -> {
+            // 下发ticket
+            Ticket ticket = new Ticket();
+            ticket.setUserId(user.getId());
+            // 默认失效时间为一天
+            ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
+            ticket.setTicket(PasswordUtil.get10UUID());
+            ticketService.save(ticket);
+            // 获取ip和地址
+            String city = getAddress(getIp(request));
+            // 打入消息队列，异步统计
+            UserStat userStat = new UserStat(user.getId(), city, new Date());
+            producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
+            log.info(UCUtil.genLog(Constant.USER_LOG, Constant.USER, user.getId(), "注册成功成功"));
+        });
         // 返回token
         return DigestUtil.Encrypt(user.getId().toString() + Constant.SPLIT + user.getProjectId());
     }
@@ -132,48 +139,50 @@ public class UserService extends BaseService<User, UserRepo> {
         if (!PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()).equals(oldUser.getPassword())) {
             throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR, oldUser.getId());
         }
-        // 更新ticket
-        Ticket ticket = ticketService.findByUserId(oldUser.getId());
-        if (ticket != null) {
-            // 默认失效时间为一天，保存密码时保留三十天
-            if (user.isRemember()) {
-                ticket.setExpired(TimeUtil.plusDays(new Date(), 30));
+        // 校验成功后异步执行后续操作
+        exec.execute(() -> {
+            // 更新ticket
+            Ticket ticket = ticketService.findByUserId(oldUser.getId());
+            if (ticket != null) {
+                // 默认失效时间为一天，保存密码时保留三十天
+                if (user.isRemember()) {
+                    ticket.setExpired(TimeUtil.plusDays(new Date(), 30));
+                } else {
+                    ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
+                }
+                ticketService.save(ticket);
             } else {
-                ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
+                ticket = new Ticket();
+                // 默认失效时间为一天，保存密码时保留三十天
+                if (user.isRemember()) {
+                    ticket.setExpired(TimeUtil.plusDays(new Date(), 30));
+                } else {
+                    ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
+                }
+                ticket.setUserId(oldUser.getId());
+                ticket.setTicket(PasswordUtil.get10UUID());
+                ticketService.save(ticket);
             }
-            ticketService.save(ticket);
-        } else {
-            ticket = new Ticket();
-            // 默认失效时间为一天，保存密码时保留三十天
-            if (user.isRemember()) {
-                ticket.setExpired(TimeUtil.plusDays(new Date(), 30));
+            // 获取ip和地址
+            String city = getAddress(getIp(request));
+            Stat stat = statService.findByUserId(oldUser.getId());
+            // 当无统计信息时，不需要判断异地登陆
+            if (stat == null) {
+                // 打入消息队列，异步统计
+                UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
+                producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
             } else {
-                ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
+                if (!city.equals(stat.getCityList().get(0).getAddress()) && StringUtils.isNotEmpty(user.getEmail())) {
+                    log.warn(user.getUsername() + "异地登陆！" + city);
+                    // 发送登陆异常的邮件
+                    mailService.sendSimpleMail(user.getEmail());
+                }
             }
-            ticket.setUserId(oldUser.getId());
-            ticket.setTicket(PasswordUtil.get10UUID());
-            ticketService.save(ticket);
-        }
-        // 获取ip和地址
-        String city = getAddress(getIp(request));
-        Stat stat = statService.findByUserId(oldUser.getId());
-        // 当无统计信息时，不需要判断异地登陆
-        if (stat == null) {
             // 打入消息队列，异步统计
             UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
             producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
-            // 返回token
-            return DigestUtil.Encrypt(oldUser.getId().toString() + Constant.SPLIT + oldUser.getProjectId());
-        }
-        if (!city.equals(stat.getCityList().get(0).getAddress()) && StringUtils.isNotEmpty(user.getEmail())) {
-            log.warn(user.getUsername() + "异地登陆！" + city);
-            // 发送登陆异常的邮件
-            mailService.sendSimpleMail(user.getEmail());
-        }
-        // 打入消息队列，异步统计
-        UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
-        producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
-        log.info(UCUtil.genLog(Constant.USER_LOG, Constant.USER, oldUser.getId(), "登陆成功"));
+            log.info(UCUtil.genLog(Constant.USER_LOG, Constant.USER, oldUser.getId(), "登陆成功"));
+        });
         // 返回token
         return DigestUtil.Encrypt(oldUser.getId().toString() + Constant.SPLIT + oldUser.getProjectId());
     }

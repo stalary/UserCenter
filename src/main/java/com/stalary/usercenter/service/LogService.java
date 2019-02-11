@@ -1,8 +1,10 @@
 package com.stalary.usercenter.service;
 
 import com.stalary.usercenter.data.Constant;
+import com.stalary.usercenter.data.ResultEnum;
 import com.stalary.usercenter.data.entity.Log;
 import com.stalary.usercenter.data.entity.User;
+import com.stalary.usercenter.exception.MyException;
 import com.stalary.usercenter.repo.LogRepo;
 import com.stalary.usercenter.utils.UCUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -42,42 +44,43 @@ public class LogService extends BaseService<Log, LogRepo> {
         List<Log> infoLog = new ArrayList<>();
         List<Log> warnLog = new ArrayList<>();
         List<Log> errorLog = new ArrayList<>();
-        if (projectService.verify(projectId, key)) {
-            List<Long> userIdList = userService
-                    .findByProjectId(projectId)
-                    .stream()
-                    .map(User::getId)
-                    .collect(Collectors.toList());
-            // 查找用户日志
-            List<Log> userLog =
-                    repo
-                            .findLogByProject(Constant.USER, userIdList)
-                            .stream()
-                            .peek(log -> log.setContent("userId" + Constant.SPLIT + log.getCommonId() + log.getContent()))
-                            .collect(Collectors.toList());
-            // 查找项目日志
-            List<Log> projectLog = repo
-                    .findLogByProject(Constant.PROJECT, Collections.singletonList(projectId));
-            // 合并日志
-            userLog.addAll(projectLog);
-            userLog.forEach(l -> {
-                switch (l.getLevel()) {
-                    case Constant.INFO_LOG:
-                        infoLog.add(l);
-                        break;
-                    case Constant.WARN_LOG:
-                        warnLog.add(l);
-                        break;
-                    case Constant.ERROR_LOG:
-                        errorLog.add(l);
-                        break;
-                    default:
-                        break;
-                }
-            });
-            log.info(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, projectId, "查看项目所有日志"));
-
+        if (!projectService.verify(projectId, key)) {
+            throw new MyException(ResultEnum.PROJECT_REJECT);
         }
+        List<Long> userIdList = userService
+                .findByProjectId(projectId)
+                .stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
+        // 查找用户日志
+        List<Log> userLog =
+                repo
+                        .findLogByProject(Constant.USER, userIdList)
+                        .stream()
+                        .peek(log -> log.setContent("userId" + Constant.SPLIT + log.getCommonId() + log.getContent()))
+                        .collect(Collectors.toList());
+        // 查找项目日志
+        List<Log> projectLog = repo
+                .findLogByProject(Constant.PROJECT, Collections.singletonList(projectId));
+        // 合并日志
+        userLog.addAll(projectLog);
+        userLog.forEach(l -> {
+            switch (l.getLevel()) {
+                case Constant.INFO_LOG:
+                    infoLog.add(l);
+                    break;
+                case Constant.WARN_LOG:
+                    warnLog.add(l);
+                    break;
+                case Constant.ERROR_LOG:
+                    errorLog.add(l);
+                    break;
+                default:
+                    break;
+            }
+        });
+        log.info(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, projectId, "查看项目所有日志"));
+
         Map<String, List<Log>> ret = new HashMap<>();
         ret.put(Constant.INFO_LOG, infoLog);
         ret.put(Constant.WARN_LOG, warnLog);
