@@ -1,5 +1,5 @@
 # UserCenter
-
+![控制台](https://upload-images.jianshu.io/upload_images/9252736-a5419ec0630360d9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 # structure
 ![架构图](https://upload-images.jianshu.io/upload_images/9252736-05e63bd417a0d91e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
@@ -27,8 +27,9 @@ and I need to apply for a project id for you.
 4. use spring boot build this project
 
 # How to use it
+> go [console](http://userfe.stalary.com/) register
 
-> go [server](http://usercenter.stalary.com/easy-doc.html)
+> go [easydoc](http://usercenter.stalary.com/easy-doc.html) use interface
 
 > use /facade/project input your project name it will return:
 ```

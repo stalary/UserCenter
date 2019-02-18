@@ -3,6 +3,7 @@ package com.stalary.usercenter.service;
 import com.alibaba.fastjson.JSONObject;
 import com.stalary.lightmqclient.facade.Producer;
 import com.stalary.usercenter.client.OutClient;
+import com.stalary.usercenter.data.Constant;
 import com.stalary.usercenter.data.ResultEnum;
 import com.stalary.usercenter.data.dto.UserStat;
 import com.stalary.usercenter.data.entity.Stat;
@@ -12,7 +13,6 @@ import com.stalary.usercenter.data.vo.UserVo;
 import com.stalary.usercenter.exception.MyException;
 import com.stalary.usercenter.repo.UserRepo;
 import com.stalary.usercenter.service.lightmq.Consumer;
-import com.stalary.usercenter.data.Constant;
 import com.stalary.usercenter.utils.DigestUtil;
 import com.stalary.usercenter.utils.PasswordUtil;
 import com.stalary.usercenter.utils.TimeUtil;
@@ -20,16 +20,17 @@ import com.stalary.usercenter.utils.UCUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -62,6 +63,9 @@ public class UserService extends BaseService<User, UserRepo> {
 
     @Resource
     private OutClient outClient;
+
+    @Resource(name = "stringRedisTemplate")
+    private StringRedisTemplate redis;
 
     @Autowired
     protected UserService(UserRepo userRepo) {
@@ -97,8 +101,10 @@ public class UserService extends BaseService<User, UserRepo> {
         String salt = PasswordUtil.get5UUID();
         user.setSalt(salt);
         user.setPassword(PasswordUtil.getPassword(user.getPassword(), salt));
-        repo.save(user);
+        User save = repo.save(user);
         exec.execute(() -> {
+            long start = System.currentTimeMillis();
+            log.info("start async register task");
             // 下发ticket
             Ticket ticket = new Ticket();
             ticket.setUserId(user.getId());
@@ -111,7 +117,11 @@ public class UserService extends BaseService<User, UserRepo> {
             // 打入消息队列，异步统计
             UserStat userStat = new UserStat(user.getId(), city, new Date());
             producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
+            // 缓存7天
+            String redisKey = genRedisKey(save.getId());
+            redis.opsForValue().set(redisKey, JSONObject.toJSONString(save), 7, TimeUnit.DAYS);
             log.info(UCUtil.genLog(Constant.USER_LOG, Constant.USER, user.getId(), "注册成功成功"));
+            log.info("end async register task time=" + (System.currentTimeMillis() - start));
         });
         // 返回token
         return DigestUtil.Encrypt(user.getId().toString() + Constant.SPLIT + user.getProjectId());
@@ -141,6 +151,8 @@ public class UserService extends BaseService<User, UserRepo> {
         }
         // 校验成功后异步执行后续操作
         exec.execute(() -> {
+            long start = System.currentTimeMillis();
+            log.info("start async login task");
             // 更新ticket
             Ticket ticket = ticketService.findByUserId(oldUser.getId());
             if (ticket != null) {
@@ -182,6 +194,7 @@ public class UserService extends BaseService<User, UserRepo> {
             UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
             producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
             log.info(UCUtil.genLog(Constant.USER_LOG, Constant.USER, oldUser.getId(), "登陆成功"));
+            log.info("end async login task time=" + (System.currentTimeMillis() - start));
         });
         // 返回token
         return DigestUtil.Encrypt(oldUser.getId().toString() + Constant.SPLIT + oldUser.getProjectId());
@@ -220,6 +233,9 @@ public class UserService extends BaseService<User, UserRepo> {
         }
         oldUser.setPassword(PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()));
         repo.save(oldUser);
+        // 缓存7天
+        String redisKey = genRedisKey(oldUser.getId());
+        redis.opsForValue().set(redisKey, JSONObject.toJSONString(oldUser), 7, TimeUnit.DAYS);
         // 返回token
         return DigestUtil.Encrypt(oldUser.getId().toString() + Constant.SPLIT + oldUser.getProjectId());
     }
@@ -261,6 +277,9 @@ public class UserService extends BaseService<User, UserRepo> {
         oldUser.setPhone(user.getPhone());
         oldUser.setRole(user.getRole());
         repo.save(oldUser);
+        // 缓存7天
+        String redisKey = genRedisKey(oldUser.getId());
+        redis.opsForValue().set(redisKey, JSONObject.toJSONString(oldUser), 7, TimeUnit.DAYS);
         return DigestUtil.Encrypt(oldUser.getId().toString() + Constant.SPLIT + oldUser.getProjectId());
 
     }
@@ -279,14 +298,14 @@ public class UserService extends BaseService<User, UserRepo> {
         if (!ticketService.judgeTime(userId)) {
             throw new MyException(ResultEnum.TICKET_EXPIRED, userId);
         }
-        return repo.findByIdAndStatusGreaterThanEqual(userId, 0);
+        return get(userId);
     }
 
     public User findById(long userId, String key, long projectId) {
         if (!projectService.verify(projectId, key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT, projectId);
         }
-        return repo.findByIdAndStatusGreaterThanEqual(userId, 0);
+        return get(userId);
     }
 
     public List<User> findByProjectId(Long projectId) {
@@ -298,6 +317,24 @@ public class UserService extends BaseService<User, UserRepo> {
             throw new MyException(ResultEnum.PROJECT_REJECT, projectId);
         }
         return repo.findByProjectIdAndRoleAndStatusGreaterThanEqual(projectId, role, 0);
+    }
+
+    private User get(long userId) {
+        String redisKey = genRedisKey(userId);
+        String redisData = redis.opsForValue().get(redisKey);
+        if (StringUtils.isEmpty(redisData)) {
+            User user = repo.findByIdAndStatusGreaterThanEqual(userId, 0);
+            if (user != null) {
+                // 缓存7天
+                redis.opsForValue().set(redisKey, JSONObject.toJSONString(user), 7, TimeUnit.DAYS);
+            }
+            return user;
+        }
+        return JSONObject.parseObject(redisData, User.class);
+    }
+
+    private String genRedisKey(long userId) {
+        return Constant.USER_PREFIX + Constant.SPLIT + String.valueOf(userId);
     }
 
     /**

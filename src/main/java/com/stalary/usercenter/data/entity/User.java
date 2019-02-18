@@ -1,5 +1,6 @@
 package com.stalary.usercenter.data.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -60,12 +61,14 @@ public class User extends BaseEntity {
     /**
      * 密码
      */
+    @JSONField(serialize = false, deserialize = false)
     private String password;
 
     /**
      * 盐
      */
     @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
     private String salt;
 
     /**
@@ -74,6 +77,7 @@ public class User extends BaseEntity {
     private Long projectId;
 
     @Transient
+    @JSONField(serialize = false, deserialize = false)
     private boolean remember = false;
 
     /**
@@ -94,5 +98,6 @@ public class User extends BaseEntity {
      * 状态，-1为删除，0为正常，默认为0
      */
     @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
     private Integer status = 0;
 }

@@ -29,6 +29,8 @@ public class Constant {
 
     public static final String ERROR_LOG = "ERROR";
 
+    public static final String USER_PREFIX = "user_info";
+
     /** 配置支持跨域列表 **/
     public static final String[] ORIGIN = {
             "http://localhost:7300",

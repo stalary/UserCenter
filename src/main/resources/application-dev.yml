@@ -9,6 +9,15 @@ spring:
     username: root
     password: li197910
     driver-class-name: com.mysql.jdbc.Driver
+  redis:
+    host: localhost
+    timeout: 5000ms
+    port: 6379
+    lettuce:
+      pool:
+        max-idle: 10
+        max-active: 10
+        min-idle: 1
   http:
     encoding:
       charset: utf-8
@@ -18,7 +27,7 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: update
-    show-sql: true
+    show-sql: false
   jackson:
       serialization:
         indent_output: true

@@ -49,6 +49,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+        <!-- redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!-- lettuce依赖于pool2 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>2.6.0</version>
+        </dependency>
         <!-- Spring Boot 邮件服务 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -91,12 +102,6 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.7</version>
         </dependency>
-        <!-- fastjson -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.47</version>
-        </dependency>
         <!-- easydoc -->
         <dependency>
             <groupId>com.stalary</groupId>
@@ -118,12 +123,21 @@
                 <version>1.0.0</version>
                 <configuration>
                     <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <serverId>docker-maven</serverId>
+                    <maintainer>stalary@163.com</maintainer>
+                    <baseImage>openjdk:8-jdk-alpine</baseImage>
+                    <!-- 设置打包时的tag -->
                     <imageTags>
-                        <imageTag>0.0.1</imageTag>
+                        <imageTag>0.0.2</imageTag>
                         <imageTag>latest</imageTag>
                     </imageTags>
+                    <!-- 打包完毕后推送镜像 -->
+                    <pushImage>true</pushImage>
+                    <!-- 推送tag -->
+                    <pushImageTag>true</pushImageTag>
+                    <!-- 覆盖tag -->
                     <forceTags>true</forceTags>
-                    <dockerDirectory>src/main/docker</dockerDirectory>
+                    <entryPoint>["java", "-jar", "-Duser.timezone=GMT+08", "/${project.build.finalName}.jar"]</entryPoint>
                     <resources>
                         <resource>
                             <targetPath>/</targetPath>
