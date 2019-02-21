@@ -35,7 +35,8 @@ public class Constant {
     public static final String[] ORIGIN = {
             "http://localhost:7300",
             "http://120.24.5.178:7300",
+            "http://localhost:3000",
             "http://47.94.248.38:7300",
-    "http://userfe.stalary.com"};
+            "http://userfe.stalary.com"};
 
 }
