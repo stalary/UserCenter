@@ -25,7 +25,7 @@ import java.util.List;
  * @model Stat
  * @description 统计对象
  * @field loginCount 登陆次数
- * @field cityList 登陆城市列表
+ * @field cityList 登陆城市列表,见Address
  **/
 @Data
 @AllArgsConstructor

@@ -85,13 +85,27 @@ public class FacadeController {
      * @method getAllUserStat 获取当前项目的所有统计信息
      * @param projectId  项目id
      * @param key 项目的key
-     * @return StatVo 统计信息
      **/
     @GetMapping("/statistics")
     public ResponseMessage getAllUserStat(
             @RequestParam Long projectId,
             @RequestParam String key) {
-        return ResponseMessage.successMessage(statService.findByProjectId(projectId, key));
+        return ResponseMessage.successMessage(statService.getStatByProjectId(projectId, key));
+    }
+
+    /**
+     * @method getUserStat 获取指定项目某个用户的统计信息
+     * @param projectId 项目id
+     * @param key 项目的key
+     * @param userId 用户id
+     * @return Stat 统计信息
+     **/
+    @GetMapping("/statistics/user")
+    public ResponseMessage getUserStat(
+            @RequestParam Long projectId,
+            @RequestParam String key,
+            @RequestParam Long userId) {
+        return ResponseMessage.successMessage(statService.getStatByUserId(projectId, key, userId));
     }
 
     /**

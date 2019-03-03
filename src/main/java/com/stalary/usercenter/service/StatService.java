@@ -5,9 +5,6 @@ import com.stalary.usercenter.data.ResultEnum;
 import com.stalary.usercenter.data.dto.Address;
 import com.stalary.usercenter.data.dto.UserStat;
 import com.stalary.usercenter.data.entity.Stat;
-import com.stalary.usercenter.data.entity.User;
-import com.stalary.usercenter.data.vo.StatVo;
-import com.stalary.usercenter.data.vo.UserVo;
 import com.stalary.usercenter.exception.MyException;
 import com.stalary.usercenter.repo.StatRepo;
 import com.stalary.usercenter.utils.UCUtil;
@@ -17,7 +14,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -57,7 +56,7 @@ public class StatService extends BaseService<Stat, StatRepo> {
                 }
             }
             if (flag) {
-                addressList.add(new Address(city, 1));
+                addressList.add(new Address(city, 1L));
             }
             stat.setCityList(addressList);
             repo.save(stat);
@@ -66,31 +65,32 @@ public class StatService extends BaseService<Stat, StatRepo> {
             newStat.setUserId(userStat.getUserId());
             newStat.setLoginCount(1L);
             List<Address> addressList = new ArrayList<>();
-            addressList.add(new Address(city, 1));
+            addressList.add(new Address(city, 1L));
             newStat.setCityList(addressList);
             repo.save(newStat);
         }
     }
 
-    public List<StatVo> findByProjectId(Long projectId, String key) {
+    public List<Address> getStatByProjectId(Long projectId, String key) {
         // 验证密钥
         if (!projectService.verify(projectId, key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
-        List<Long> userIdList = userService
-                .findByProjectId(projectId)
-                .stream()
-                .map(User::getId)
-                .collect(Collectors.toList());
-        log.info(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, projectId, "查看统计信息"));
-        return repo.findStatList(userIdList)
-                .stream()
-                .map(stat -> {
-                    stat.getCityList();
-                    User one = userService.findOne(stat.getUserId());
-                    return new StatVo(stat, new UserVo(one.getId(), one.getUsername(), one.getRole(), one.getCreateTime()));
-                })
-                .collect(Collectors.toList());
+        List<Long> userIdList = userService.getUserIdByProjectId(projectId);
+        log.info(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, projectId, "查看项目统计信息"));
+        List<Stat> statList = repo.findStatList(userIdList);
+        Map<String, Long> ret = new HashMap<>();
+        statList.forEach(s -> s.getCityList().forEach(address -> ret.put(address.getAddress(), ret.getOrDefault(address.getAddress(), 0L) + address.getCount())));
+        return ret.entrySet().stream().map(e -> new Address(e.getKey(), e.getValue())).collect(Collectors.toList());
+    }
+
+    public Stat getStatByUserId(Long projectId, String key, Long userId) {
+        // 验证密钥
+        if (!projectService.verify(projectId, key)) {
+            throw new MyException(ResultEnum.PROJECT_REJECT);
+        }
+        log.info(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, projectId, "查看用户统计信息"));
+        return findByUserId(userId);
     }
 
     public Stat findByUserId(Long userId) {

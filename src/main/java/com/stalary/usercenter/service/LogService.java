@@ -47,11 +47,7 @@ public class LogService extends BaseService<Log, LogRepo> {
         if (!projectService.verify(projectId, key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
-        List<Long> userIdList = userService
-                .findByProjectId(projectId)
-                .stream()
-                .map(User::getId)
-                .collect(Collectors.toList());
+        List<Long> userIdList = userService.getUserIdByProjectId(projectId);
         // 查找用户日志
         List<Log> userLog =
                 repo

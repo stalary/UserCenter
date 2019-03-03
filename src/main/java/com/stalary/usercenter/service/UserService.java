@@ -1,5 +1,6 @@
 package com.stalary.usercenter.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.stalary.lightmqclient.facade.Producer;
 import com.stalary.usercenter.client.OutClient;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -102,6 +104,7 @@ public class UserService extends BaseService<User, UserRepo> {
         user.setSalt(salt);
         user.setPassword(PasswordUtil.getPassword(user.getPassword(), salt));
         User save = repo.save(user);
+        String ip = getIp(request);
         exec.execute(() -> {
             long start = System.currentTimeMillis();
             log.info("start async register task");
@@ -113,7 +116,7 @@ public class UserService extends BaseService<User, UserRepo> {
             ticket.setTicket(PasswordUtil.get10UUID());
             ticketService.save(ticket);
             // 获取ip和地址
-            String city = getAddress(getIp(request));
+            String city = getAddress(ip);
             // 打入消息队列，异步统计
             UserStat userStat = new UserStat(user.getId(), city, new Date());
             producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
@@ -149,6 +152,7 @@ public class UserService extends BaseService<User, UserRepo> {
         if (!PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()).equals(oldUser.getPassword())) {
             throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR, oldUser.getId());
         }
+        String ip = getIp(request);
         // 校验成功后异步执行后续操作
         exec.execute(() -> {
             long start = System.currentTimeMillis();
@@ -176,7 +180,7 @@ public class UserService extends BaseService<User, UserRepo> {
                 ticketService.save(ticket);
             }
             // 获取ip和地址
-            String city = getAddress(getIp(request));
+            String city = getAddress(ip);
             Stat stat = statService.findByUserId(oldUser.getId());
             // 当无统计信息时，不需要判断异地登陆
             if (stat == null) {
@@ -310,6 +314,13 @@ public class UserService extends BaseService<User, UserRepo> {
 
     public List<User> findByProjectId(Long projectId) {
         return repo.findByProjectIdAndStatusGreaterThanEqual(projectId, 0);
+    }
+
+    public List<Long> getUserIdByProjectId(Long projectId) {
+        return findByProjectId(projectId)
+                .stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
     }
 
     public List<User> findByRole(Long projectId, String key, Integer role) {
