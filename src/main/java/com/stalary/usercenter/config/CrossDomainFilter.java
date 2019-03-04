@@ -2,6 +2,8 @@ package com.stalary.usercenter.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -19,6 +21,7 @@ import java.io.IOException;
  */
 @Slf4j
 @WebFilter(filterName = "crossDomainFilter", urlPatterns = "/*")
+@Configuration
 public class CrossDomainFilter extends OncePerRequestFilter {
 
     @Override
