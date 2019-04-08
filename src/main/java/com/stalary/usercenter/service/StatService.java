@@ -80,7 +80,16 @@ public class StatService extends BaseService<Stat, StatRepo> {
         log.info(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, projectId, "查看项目统计信息"));
         List<Stat> statList = repo.findStatList(userIdList);
         Map<String, Long> ret = new HashMap<>();
-        statList.forEach(s -> s.getCityList().forEach(address -> ret.put(address.getAddress(), ret.getOrDefault(address.getAddress(), 0L) + address.getCount())));
+        // 前端需要不带市的城市，需要进行切割
+        statList.forEach(s ->
+                s.getCityList().forEach(c -> {
+                    String address = c.getAddress();
+                    if (address.endsWith("市")) {
+                        address = address.substring(0, address.length() - 1);
+                    }
+                    ret.put(address,
+                            ret.getOrDefault(address, 0L) + c.getCount());
+                }));
         return ret.entrySet().stream().map(e -> new Address(e.getKey(), e.getValue())).collect(Collectors.toList());
     }
 
@@ -90,7 +99,13 @@ public class StatService extends BaseService<Stat, StatRepo> {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
         log.info(UCUtil.genLog(Constant.USER_LOG, Constant.PROJECT, projectId, "查看用户统计信息"));
-        return findByUserId(userId);
+        Stat stat = findByUserId(userId);
+        stat.getCityList().forEach(c -> {
+            if (c.getAddress().endsWith("市")) {
+                c.setAddress(c.getAddress().substring(0, c.getAddress().length() - 1));
+            }
+        });
+        return stat;
     }
 
     public Stat findByUserId(Long userId) {

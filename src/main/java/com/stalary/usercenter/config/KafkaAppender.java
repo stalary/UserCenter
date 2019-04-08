@@ -26,7 +26,7 @@ public class KafkaAppender extends AppenderBase<ILoggingEvent> {
 
     {
         LightMQProperties properties = new LightMQProperties();
-        properties.setUrl("http://120.24.5.178:8001");
+        properties.setUrl("http://39.98.160.159:8001");
         WebClientService service = new WebClientService(properties);
         producer = new Producer(service);
     }

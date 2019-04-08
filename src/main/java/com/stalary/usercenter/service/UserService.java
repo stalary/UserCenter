@@ -1,6 +1,5 @@
 package com.stalary.usercenter.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.stalary.lightmqclient.facade.Producer;
 import com.stalary.usercenter.client.OutClient;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -78,12 +76,9 @@ public class UserService extends BaseService<User, UserRepo> {
     ExecutorService exec = Executors.newFixedThreadPool(5);
 
     /**
-     * 返回token的注册
-     *
-     * @param user
-     * @return
-     */
-    public String register(User user, HttpServletRequest request, String key) {
+     * 对key，username, password进行预校验
+     **/
+    private void preCheck(User user, String key) {
         if (!projectService.verify(user.getProjectId(), key)) {
             throw new MyException(ResultEnum.PROJECT_REJECT);
         }
@@ -95,6 +90,35 @@ public class UserService extends BaseService<User, UserRepo> {
         if (StringUtils.isEmpty(user.getPassword())) {
             throw new MyException(ResultEnum.PASSWORD_EMPTY);
         }
+    }
+
+    private void userCheck(User oldUser, User user) {
+        // 用户名错误
+        if (oldUser == null) {
+            throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR);
+        }
+        // 密码错误
+        if (!PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()).equals(oldUser.getPassword())) {
+            throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR, oldUser.getId());
+        }
+    }
+
+    private String cacheUser(User oldUser) {
+        // 缓存7天
+        String redisKey = genRedisKey(oldUser.getId());
+        redis.opsForValue().set(redisKey, JSONObject.toJSONString(oldUser), 7, TimeUnit.DAYS);
+        // 返回token
+        return DigestUtil.Encrypt(oldUser.getId().toString() + Constant.SPLIT + oldUser.getProjectId());
+    }
+
+    /**
+     * 返回token的注册
+     *
+     * @param user
+     * @return
+     */
+    public String register(User user, HttpServletRequest request, String key) {
+        preCheck(user, key);
         // 重复注册
         if (repo.findByUsernameAndProjectIdAndStatusGreaterThanEqual(user.getUsername(), user.getProjectId(), 0) != null) {
             throw new MyException(ResultEnum.USERNAME_REPEAT);
@@ -104,17 +128,17 @@ public class UserService extends BaseService<User, UserRepo> {
         user.setSalt(salt);
         user.setPassword(PasswordUtil.getPassword(user.getPassword(), salt));
         User save = repo.save(user);
+        // 下发ticket
+        Ticket ticket = new Ticket();
+        ticket.setUserId(user.getId());
+        // 默认失效时间为一天
+        ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
+        ticket.setTicket(PasswordUtil.get10UUID());
+        ticketService.save(ticket);
         String ip = getIp(request);
         exec.execute(() -> {
             long start = System.currentTimeMillis();
             log.info("start async register task");
-            // 下发ticket
-            Ticket ticket = new Ticket();
-            ticket.setUserId(user.getId());
-            // 默认失效时间为一天
-            ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
-            ticket.setTicket(PasswordUtil.get10UUID());
-            ticketService.save(ticket);
             // 获取ip和地址
             String city = getAddress(ip);
             // 打入消息队列，异步统计
@@ -132,53 +156,37 @@ public class UserService extends BaseService<User, UserRepo> {
 
 
     public String login(User user, HttpServletRequest request, String key) {
-        if (!projectService.verify(user.getProjectId(), key)) {
-            throw new MyException(ResultEnum.PROJECT_REJECT);
-        }
-        // 用户名为空
-        if (StringUtils.isEmpty(user.getUsername())) {
-            throw new MyException(ResultEnum.USERNAME_EMPTY);
-        }
-        // 密码为空
-        if (StringUtils.isEmpty(user.getPassword())) {
-            throw new MyException(ResultEnum.PASSWORD_EMPTY);
-        }
+        // 预校验
+        preCheck(user, key);
         User oldUser = repo.findByUsernameAndProjectIdAndStatusGreaterThanEqual(user.getUsername(), user.getProjectId(), 0);
-        // 用户名错误
-        if (oldUser == null) {
-            throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR);
+        // 正确性校验
+        userCheck(oldUser, user);
+        // 更新ticket，需要设置为同步，否则直接通过token获取时会出现ticket失效的问题
+        Ticket ticket = ticketService.findByUserId(oldUser.getId());
+        if (ticket != null) {
+            // 默认失效时间为一天，保存密码时保留三十天
+            if (user.isRemember()) {
+                ticket.setExpired(TimeUtil.plusDays(new Date(), 30));
+            } else {
+                ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
+            }
+        } else {
+            ticket = new Ticket();
+            // 默认失效时间为一天，保存密码时保留三十天
+            if (user.isRemember()) {
+                ticket.setExpired(TimeUtil.plusDays(new Date(), 30));
+            } else {
+                ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
+            }
+            ticket.setUserId(oldUser.getId());
+            ticket.setTicket(PasswordUtil.get10UUID());
         }
-        // 密码错误
-        if (!PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()).equals(oldUser.getPassword())) {
-            throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR, oldUser.getId());
-        }
+        ticketService.save(ticket);
         String ip = getIp(request);
         // 校验成功后异步执行后续操作
         exec.execute(() -> {
             long start = System.currentTimeMillis();
             log.info("start async login task");
-            // 更新ticket
-            Ticket ticket = ticketService.findByUserId(oldUser.getId());
-            if (ticket != null) {
-                // 默认失效时间为一天，保存密码时保留三十天
-                if (user.isRemember()) {
-                    ticket.setExpired(TimeUtil.plusDays(new Date(), 30));
-                } else {
-                    ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
-                }
-                ticketService.save(ticket);
-            } else {
-                ticket = new Ticket();
-                // 默认失效时间为一天，保存密码时保留三十天
-                if (user.isRemember()) {
-                    ticket.setExpired(TimeUtil.plusDays(new Date(), 30));
-                } else {
-                    ticket.setExpired(TimeUtil.plusDays(new Date(), 1));
-                }
-                ticket.setUserId(oldUser.getId());
-                ticket.setTicket(PasswordUtil.get10UUID());
-                ticketService.save(ticket);
-            }
             // 获取ip和地址
             String city = getAddress(ip);
             Stat stat = statService.findByUserId(oldUser.getId());
@@ -205,17 +213,7 @@ public class UserService extends BaseService<User, UserRepo> {
     }
 
     public String update(User user, String key) {
-        if (!projectService.verify(user.getProjectId(), key)) {
-            throw new MyException(ResultEnum.PROJECT_REJECT);
-        }
-        // 用户名为空
-        if (StringUtils.isEmpty(user.getUsername())) {
-            throw new MyException(ResultEnum.USERNAME_EMPTY);
-        }
-        // 密码为空
-        if (StringUtils.isEmpty(user.getPassword())) {
-            throw new MyException(ResultEnum.PASSWORD_EMPTY);
-        }
+        preCheck(user, key);
         User oldUser = null;
         // 用户名错误
         if (repo.findByUsernameAndProjectIdAndStatusGreaterThanEqual(user.getUsername(), user.getProjectId(), 0) == null) {
@@ -237,11 +235,7 @@ public class UserService extends BaseService<User, UserRepo> {
         }
         oldUser.setPassword(PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()));
         repo.save(oldUser);
-        // 缓存7天
-        String redisKey = genRedisKey(oldUser.getId());
-        redis.opsForValue().set(redisKey, JSONObject.toJSONString(oldUser), 7, TimeUnit.DAYS);
-        // 返回token
-        return DigestUtil.Encrypt(oldUser.getId().toString() + Constant.SPLIT + oldUser.getProjectId());
+        return cacheUser(oldUser);
     }
 
     /**
@@ -252,27 +246,9 @@ public class UserService extends BaseService<User, UserRepo> {
      * @return
      */
     public String updateInfo(User user, String key) {
-        // 验证密钥
-        if (!projectService.verify(user.getProjectId(), key)) {
-            throw new MyException(ResultEnum.PROJECT_REJECT);
-        }
-        // 用户名为空
-        if (StringUtils.isEmpty(user.getUsername())) {
-            throw new MyException(ResultEnum.USERNAME_EMPTY);
-        }
-        // 密码为空
-        if (StringUtils.isEmpty(user.getPassword())) {
-            throw new MyException(ResultEnum.PASSWORD_EMPTY);
-        }
+        preCheck(user, key);
         User oldUser = repo.findByUsernameAndProjectIdAndStatusGreaterThanEqual(user.getUsername(), user.getProjectId(), 0);
-        // 用户名错误
-        if (oldUser == null) {
-            throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR);
-        }
-        // 密码错误
-        if (!PasswordUtil.getPassword(user.getPassword(), oldUser.getSalt()).equals(oldUser.getPassword()) && !oldUser.getPassword().equals(user.getPassword())) {
-            throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR, oldUser.getId());
-        }
+        userCheck(oldUser, user);
         oldUser.setEmail(user.getEmail());
         oldUser.setFirstId(user.getFirstId());
         oldUser.setSecondId(user.getSecondId());
@@ -281,11 +257,7 @@ public class UserService extends BaseService<User, UserRepo> {
         oldUser.setPhone(user.getPhone());
         oldUser.setRole(user.getRole());
         repo.save(oldUser);
-        // 缓存7天
-        String redisKey = genRedisKey(oldUser.getId());
-        redis.opsForValue().set(redisKey, JSONObject.toJSONString(oldUser), 7, TimeUnit.DAYS);
-        return DigestUtil.Encrypt(oldUser.getId().toString() + Constant.SPLIT + oldUser.getProjectId());
-
+        return cacheUser(oldUser);
     }
 
     public User findByToken(String token, String key) {
