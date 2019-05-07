@@ -7,6 +7,7 @@ import com.stalary.lightmqclient.WebClientService;
 import com.stalary.lightmqclient.facade.Producer;
 import com.stalary.usercenter.service.lightmq.Consumer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
 
@@ -24,18 +25,15 @@ public class KafkaAppender extends AppenderBase<ILoggingEvent> {
 
     Producer producer;
 
-    {
-        LightMQProperties properties = new LightMQProperties();
-        properties.setUrl("http://39.98.160.159:8001");
-        WebClientService service = new WebClientService(properties);
-        producer = new Producer(service);
-    }
-
     @Override
     public void start() {
         if (this.formatter == null) {
             this.formatter = new MessageFormatter();
         }
+        LightMQProperties properties = new LightMQProperties();
+        properties.setUrl("http://lightmq.stalary.com");
+        WebClientService service = new WebClientService(properties);
+        producer = new Producer(service);
         super.start();
     }
 

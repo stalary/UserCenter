@@ -76,7 +76,7 @@ public class UserService extends BaseService<User, UserRepo> {
     ExecutorService exec = Executors.newFixedThreadPool(5);
 
     /**
-     * 对key，username, password进行预校验
+     * 对key，username进行预校验
      **/
     private void preCheck(User user, String key) {
         if (!projectService.verify(user.getProjectId(), key)) {
@@ -85,10 +85,6 @@ public class UserService extends BaseService<User, UserRepo> {
         // 用户名为空
         if (StringUtils.isEmpty(user.getUsername())) {
             throw new MyException(ResultEnum.USERNAME_EMPTY);
-        }
-        // 密码为空
-        if (StringUtils.isEmpty(user.getPassword())) {
-            throw new MyException(ResultEnum.PASSWORD_EMPTY);
         }
     }
 
@@ -119,6 +115,10 @@ public class UserService extends BaseService<User, UserRepo> {
      */
     public String register(User user, HttpServletRequest request, String key) {
         preCheck(user, key);
+        // 密码为空
+        if (StringUtils.isEmpty(user.getPassword())) {
+            throw new MyException(ResultEnum.PASSWORD_EMPTY);
+        }
         // 重复注册
         if (repo.findByUsernameAndProjectIdAndStatusGreaterThanEqual(user.getUsername(), user.getProjectId(), 0) != null) {
             throw new MyException(ResultEnum.USERNAME_REPEAT);
@@ -158,6 +158,10 @@ public class UserService extends BaseService<User, UserRepo> {
     public String login(User user, HttpServletRequest request, String key) {
         // 预校验
         preCheck(user, key);
+        // 密码为空
+        if (StringUtils.isEmpty(user.getPassword())) {
+            throw new MyException(ResultEnum.PASSWORD_EMPTY);
+        }
         User oldUser = repo.findByUsernameAndProjectIdAndStatusGreaterThanEqual(user.getUsername(), user.getProjectId(), 0);
         // 正确性校验
         userCheck(oldUser, user);
@@ -247,8 +251,12 @@ public class UserService extends BaseService<User, UserRepo> {
      */
     public String updateInfo(User user, String key) {
         preCheck(user, key);
+        // 修改用户信息不再需要密码
         User oldUser = repo.findByUsernameAndProjectIdAndStatusGreaterThanEqual(user.getUsername(), user.getProjectId(), 0);
-        userCheck(oldUser, user);
+        // 用户名错误
+        if (oldUser == null) {
+            throw new MyException(ResultEnum.USERNAME_PASSWORD_ERROR);
+        }
         oldUser.setEmail(user.getEmail());
         oldUser.setFirstId(user.getFirstId());
         oldUser.setSecondId(user.getSecondId());
