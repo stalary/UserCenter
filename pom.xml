@@ -106,7 +106,7 @@
         <dependency>
             <groupId>com.stalary</groupId>
             <artifactId>easy-doc</artifactId>
-            <version>0.1.5</version>
+            <version>1.1.0</version>
         </dependency>
     </dependencies>
 
@@ -151,10 +151,11 @@
             <plugin>
                 <groupId>com.stalary</groupId>
                 <artifactId>easydoc-maven-plugin</artifactId>
-                <version>0.1.0</version>
+                <version>1.0.1</version>
                 <!-- -Dpath可以替代 -->
                 <configuration>
                     <path>com.stalary.usercenter</path>
+                    <excludeFile>CrossDomainFilter</excludeFile>
                 </configuration>
                 <executions>
                     <execution>
